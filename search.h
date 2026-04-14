@@ -3,14 +3,14 @@
 
 // ============================================================
 // search.h — Greedy Search Algorithm
-// Owner: Member 3 (Search Algorithm & Complexity Specialist)
+// Owner: Hira (Search Algorithm & Complexity Specialist)
 //
 // Provides the search function that finds the top-K most similar
 // nodes to a query vector by traversing the NSW graph.
 //
 // Uses:
-//   - Member 1's cosineDistance() for comparing vectors
-//   - Member 2's Node struct and neighbor pointers for navigation
+//   - Arqish's cosineDistance() for comparing vectors
+//   - Areeba's Node struct and neighbor pointers for navigation
 //   - std::priority_queue (min-heap) for candidate management
 //   - std::unordered_set for visited node tracking
 // ============================================================
@@ -34,7 +34,7 @@ struct SearchResult {
 //
 // Parameters:
 //   graph        - Pointer to the NSWGraph to search in
-//   queryVector  - The vectorized query (output of Member 1's vectorize())
+//   queryVector  - The vectorized query (output of Arqish's vectorize())
 //   k            - Number of results to return (e.g., top 5)
 //   efSearch     - Exploration factor: how many candidates to keep open
 //                  Higher = more accurate but slower. Uses EF_SEARCH from config.

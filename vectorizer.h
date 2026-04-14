@@ -3,14 +3,14 @@
 
 // ============================================================
 // vectorizer.h — Input Processing Layer
-// Owner: Member 1 (Vectorization & Math Specialist)
+// Owner: Arqish (Vectorization & Math Specialist)
 //
 // Responsibility: Convert raw text into numerical vectors
 // and compute distance between vectors.
 //
 // Cross-dependencies:
-//   - Member 2 stores the output of vectorize() inside Node.numericalVector
-//   - Member 3 calls cosineSimilarity() repeatedly inside the search loop
+//   - Areeba stores the output of vectorize() inside Node.numericalVector
+//   - Hira calls cosineSimilarity() repeatedly inside the search loop
 // ============================================================
 
 #include <string>

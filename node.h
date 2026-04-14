@@ -3,12 +3,12 @@
 
 // ============================================================
 // node.h — Graph Node Structure
-// Owner: Member 2 (Graph Structure & Memory Specialist)
+// Owner: Areeba (Graph Structure & Memory Specialist)
 //
 // Defines a single node in the NSW graph.
 // Each node stores:
 //   - The original text string
-//   - Its numerical vector (output of Member 1's vectorize())
+//   - Its numerical vector (output of Arqish's vectorize())
 //   - A list of pointers to neighboring nodes (adjacency list)
 // ============================================================
 
@@ -21,7 +21,7 @@ struct Node {
     // Original note text that the user inserted
     string text;
 
-    // Numerical "fingerprint" vector — output of Member 1's vectorize()
+    // Numerical "fingerprint" vector — output of Arqish's vectorize()
     vector<double> numericalVector;
 
     // Adjacency list — pointers to connected nodes in the graph

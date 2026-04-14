@@ -1,8 +1,8 @@
 // ============================================================
 // nsw_graph.cpp — Navigable Small World Graph (Implementation)
-// Owner: Member 2 (Graph Structure & Memory Specialist)
+// Owner: Areeba (Graph Structure & Memory Specialist)
 //
-// SKELETON CODE — Member 2 must implement the TODO sections.
+// SKELETON CODE — Areeba must implement the TODO sections.
 // Each function has detailed comments explaining the logic.
 // ============================================================
 
@@ -32,7 +32,7 @@ NSWGraph::NSWGraph() {
 //    all memory when the program ends, preventing leaks."
 // ------------------------------------------------------------
 NSWGraph::~NSWGraph() {
-    // TODO: Member 2 — Loop through masterList and delete each Node*
+    // TODO: Areeba — Loop through masterList and delete each Node*
     // Hint: use a simple for loop
     //
     // for (Node* node : masterList) {
@@ -57,7 +57,7 @@ NSWGraph::~NSWGraph() {
 //    algorithm to backtrack slightly if needed."
 // ------------------------------------------------------------
 void NSWGraph::addEdge(Node* a, Node* b) {
-    // TODO: Member 2 — Implement bidirectional edge creation
+    // TODO: Areeba — Implement bidirectional edge creation
     //
     // Guard: don't add edge if either neighbor list is already at max M
     //
@@ -75,10 +75,10 @@ void NSWGraph::addEdge(Node* a, Node* b) {
 // and return a raw pointer to it.
 //
 // This is the ONLY way nodes should be created in the project.
-// Member 4's insert() calls this function.
+// Shaheer's insert() calls this function.
 // ------------------------------------------------------------
 Node* NSWGraph::createNode(const string& text, const vector<double>& vec) {
-    // TODO: Member 2 — Allocate a new Node and track it
+    // TODO: Areeba — Allocate a new Node and track it
     //
     // Node* newNode = new Node(text, vec);
     // masterList.push_back(newNode);
@@ -98,7 +98,7 @@ Node* NSWGraph::getEntryPoint() const {
 // ------------------------------------------------------------
 // setEntryPoint(node)
 // Update the entry point to a new node.
-// Called by Member 4's insert() after creating a new node.
+// Called by Shaheer's insert() after creating a new node.
 //
 // Viva Defense:
 //   "It is the starting node for the search. We update it to
@@ -120,7 +120,7 @@ int NSWGraph::getNodeCount() const {
 // ------------------------------------------------------------
 // getAllNodes()
 // Return a const reference to the master list.
-// Used by Member 4 for brute-force baseline comparison.
+// Used by Shaheer for brute-force baseline comparison.
 // ------------------------------------------------------------
 const vector<Node*>& NSWGraph::getAllNodes() const {
     return masterList;

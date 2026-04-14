@@ -3,13 +3,13 @@
 
 // ============================================================
 // nsw_graph.h — Navigable Small World Graph Container
-// Owner: Member 2 (Graph Structure & Memory Specialist)
+// Owner: Areeba (Graph Structure & Memory Specialist)
 //
 // The NSWGraph class is the main container that holds all nodes
 // and provides methods to manage the graph structure.
 //
-// Member 4's insert() function will call addNode() and addEdge().
-// Member 3's search() will access the graph via getEntryPoint()
+// Shaheer's insert() function will call addNode() and addEdge().
+// Hira's search() will access the graph via getEntryPoint()
 // and node->neighbors to navigate the graph.
 // ============================================================
 
@@ -49,14 +49,14 @@ public:
     Node* getEntryPoint() const;
 
     // Update the entry point to a new node.
-    // Called by Member 4's insert() after adding a new node.
+    // Called by Shaheer's insert() after adding a new node.
     void setEntryPoint(Node* node);
 
     // Return the total number of nodes in the graph.
     int getNodeCount() const;
 
     // Return a const reference to the master list.
-    // Used by Member 4 for brute-force baseline comparison.
+    // Used by Shaheer for brute-force baseline comparison.
     const vector<Node*>& getAllNodes() const;
 };
 

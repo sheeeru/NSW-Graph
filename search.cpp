@@ -1,13 +1,13 @@
 // ============================================================
 // search.cpp — Greedy Search Algorithm (Implementation)
-// Owner: Member 3 (Search Algorithm & Complexity Specialist)
+// Owner: Hira (Search Algorithm & Complexity Specialist)
 //
-// SKELETON CODE — Member 3 must implement the TODO sections.
+// SKELETON CODE — Hira must implement the TODO sections.
 // Each function has detailed comments explaining the logic.
 // ============================================================
 
 #include "search.h"
-#include "vectorizer.h"    // Member 1's cosineDistance()
+#include "vectorizer.h"    // Arqish's cosineDistance()
 #include "config.h"
 #include <queue>           // std::priority_queue
 #include <unordered_set>   // std::unordered_set
@@ -71,14 +71,14 @@ vector<SearchResult> search(
 ) {
     vector<SearchResult> results;
 
-    // TODO: Member 3 — Implement the empty graph guard
+    // TODO: Hira — Implement the empty graph guard
     //
     // if (graph == nullptr || graph->getEntryPoint() == nullptr || k <= 0) {
     //     return results; // empty
     // }
     return results; // Placeholder — replace with actual implementation
 
-    // TODO: Member 3 — Implement the greedy search algorithm
+    // TODO: Hira — Implement the greedy search algorithm
     //
     // Step 1: Get the entry point
     // Node* current = graph->getEntryPoint();

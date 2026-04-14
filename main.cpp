@@ -1,8 +1,8 @@
 // ============================================================
 // main.cpp — NSW Project Test Harness
 //
-// TEMPORARY FILE — Member 4 will replace this with the full CLI.
-// Right now, this file tests Member 1's 4 functions and verifies
+// TEMPORARY FILE — Shaheer will replace this with the full CLI.
+// Right now, this file tests Shaheer's functions and verifies
 // that the full project skeleton compiles together cleanly.
 //
 // Compile:  g++ -std=c++17 -o test main.cpp vectorizer.cpp nsw_graph.cpp search.cpp
