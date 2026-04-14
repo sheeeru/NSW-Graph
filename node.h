@@ -5,22 +5,31 @@
 // node.h — Graph Node Structure
 // Owner: Member 2 (Graph Structure & Memory Specialist)
 //
-// PLACEHOLDER — Member 2 will implement this file.
-// Do not modify until Member 2 begins their work.
+// Defines a single node in the NSW graph.
+// Each node stores:
+//   - The original text string
+//   - Its numerical vector (output of Member 1's vectorize())
+//   - A list of pointers to neighboring nodes (adjacency list)
 // ============================================================
 
 #include <string>
 #include <vector>
-#include "config.h"
 
-// Forward declaration (Member 2 will define this)
-// struct Node {
-//     string text;                  // Original note text
-//     vector<double> numericalVector; // Output of Member 1's vectorize()
-//     vector<Node*> neighbors;      // Adjacency list (pointer to connected nodes)
-//
-//     Node(string t, vector<double> vec)
-//         : text(t), numericalVector(vec) {}
-// };
+using namespace std;
+
+struct Node {
+    // Original note text that the user inserted
+    string text;
+
+    // Numerical "fingerprint" vector — output of Member 1's vectorize()
+    vector<double> numericalVector;
+
+    // Adjacency list — pointers to connected nodes in the graph
+    vector<Node*> neighbors;
+
+    // Constructor: initializes a node with text and its vector
+    Node(string t, vector<double> vec)
+        : text(t), numericalVector(vec) {}
+};
 
 #endif // NODE_H
