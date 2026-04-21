@@ -1,127 +1,160 @@
-// ============================================================
-// nsw_graph.cpp — Navigable Small World Graph (Implementation)
-// Owner: Areeba (Graph Structure & Memory Specialist)
-//
-// SKELETON CODE — Areeba must implement the TODO sections.
-// Each function has detailed comments explaining the logic.
-// ============================================================
-
 #include "nsw_graph.h"
+#include <iostream>
+#include <vector>
+using namespace std;
 
-// ------------------------------------------------------------
-// Constructor
-// Initialize an empty graph with no nodes.
-// ------------------------------------------------------------
+
 NSWGraph::NSWGraph() {
     entryPoint = nullptr;
-    // masterList is already empty (default-initialized by vector)
+    //default masterList is already empty
 }
 
-// ------------------------------------------------------------
-// Destructor
-// Free all dynamically allocated nodes to prevent memory leaks.
-//
-// IMPORTANT: In C++, every 'new' must have a matching 'delete'.
-// We keep a masterList of all Node pointers so that when the
-// NSWGraph object is destroyed (e.g., program ends), all memory
-// is properly freed.
-//
-// Viva Defense:
-//   "Since we use 'new Node()', we must manually 'delete'.
-//    We keep a masterList in the class to ensure we can free
-//    all memory when the program ends, preventing leaks."
-// ------------------------------------------------------------
-NSWGraph::~NSWGraph() {
-    // TODO: Areeba — Loop through masterList and delete each Node*
-    // Hint: use a simple for loop
-    //
-    // for (Node* node : masterList) {
-    //     delete node;
-    // }
-    // masterList.clear();
+
+NSWGraph::~NSWGraph() {// loop and delete all nodes frfom master list
+    for (int i=0; i<masterList.size(); i++){
+        delete masterList[i];
+    }
+    masterList.clear();
+    entryPoint = nullptr;
+    cout << "graph empty " << endl;
 }
 
-// ------------------------------------------------------------
-// addEdge(Node* a, Node* b)
-// Create a bidirectional (undirected) edge between two nodes.
-//
-// Steps:
+// -------------------------------------------------------
+// printGraph
+// -------------------------------------------------------
+// Loops through every node in masterList and prints
+// its text and the text of each of its neighbors.
+// Used for debugging and viva demonstration.
+
+void NSWGraph::printGraph() const {
+    if (masterList.empty()) {
+        cout << "Graph is empty." << endl;
+        return;
+    }
+    cout << "--- Graph State ---" << endl;
+    cout << "Total nodes: " << masterList.size() << endl << endl;
+
+    for (int i = 0; i < masterList.size(); i++) {
+        Node* current = masterList[i];
+
+        cout << "[" << i << "] " << current->text << endl;
+        cout << "Neighbors (" << current->neighbors.size() << "): ";
+
+        for (int j = 0; j < current->neighbors.size(); j++) {
+            cout << current->neighbors[j]->text;
+            if (j < current->neighbors.size() - 1) {
+                cout << ", "; }
+        }
+        cout << endl << endl;
+    }
+
+    cout << "Entry Point: ";
+    if (entryPoint != nullptr) {
+        cout << entryPoint->text << endl;
+    } else {
+        cout << "none" << endl; }
+    cout << "-------------------" << endl;
+}
+
+//Creates a bidirectional (undirected) edge between two nodes.
+
 //   1. Add 'b' to 'a's neighbor list
 //   2. Add 'a' to 'b's neighbor list
-//   3. If either list exceeds M (from config.h), do NOT add.
-//      This prevents over-connection which slows down search.
-//
-// Viva Defense:
-//   "Edges are bidirectional pointers. This allows us to traverse
-//    from Node A to B and back, which is crucial for the search
-//    algorithm to backtrack slightly if needed."
+//   3. If either list exceeds M (from config.h), do NOT add. (prevents overconnection)
+
 // ------------------------------------------------------------
 void NSWGraph::addEdge(Node* a, Node* b) {
-    // TODO: Areeba — Implement bidirectional edge creation
-    //
-    // Guard: don't add edge if either neighbor list is already at max M
-    //
-    // if (a->neighbors.size() < M) {
-    //     a->neighbors.push_back(b);
-    // }
-    // if (b->neighbors.size() < M) {
-    //     b->neighbors.push_back(a);
-    // }
+    if (a == b) {
+        return; }
+
+    if (a->neighbors.size() < M && b->neighbors.size() < M) {
+        a->neighbors.push_back(b);
+        b->neighbors.push_back(a); 
+        cout << "Node edge from " << a->text << " to " << b->text << " created" << endl;}
+    else{
+        cout << "edge addition failed! Size exceeds Max nighbors M = " << M << endl;
+    }
+
 }
 
 // ------------------------------------------------------------
 // createNode(text, vec)
 // Allocate a new Node on the heap, add it to masterList,
-// and return a raw pointer to it.
-//
-// This is the ONLY way nodes should be created in the project.
-// Shaheer's insert() calls this function.
-// ------------------------------------------------------------
-Node* NSWGraph::createNode(const string& text, const vector<double>& vec) {
-    // TODO: Areeba — Allocate a new Node and track it
-    //
-    // Node* newNode = new Node(text, vec);
-    // masterList.push_back(newNode);
-    // return newNode;
-    return nullptr; // Placeholder — replace with actual implementation
-}
 
 // ------------------------------------------------------------
+Node* NSWGraph::createNode(const string& text, const vector<double>& vec) {
+    
+    Node* newNode = new Node(text, vec);
+    masterList.push_back(newNode); // this catering addition to the list so that when we delete and destructr gets called ALL nodes delete 
+    return newNode;
+}
+
+//deleete node:
+
+void NSWGraph::deleteNode(Node* target) {
+    if (target == nullptr) {
+        return;}
+
+    vector<Node*>& nb = target->neighbors;
+
+    //Re-link neighbors to each other.
+    //addEdge checks M limit, so no neighbor gets over-connected.
+    for (int i = 0; i < nb.size(); i++) {
+        for (int j = i + 1; j < nb.size(); j++) {
+            addEdge(nb[i], nb[j]); }   }
+
+    //remove target from every neighbor's own list.
+    for (int i = 0; i < nb.size(); i++) {
+        vector<Node*>& theirNeighbors = nb[i]->neighbors;
+        for (int j = 0; j < theirNeighbors.size(); j++) {
+            if (theirNeighbors[j] == target) {
+                theirNeighbors.erase(theirNeighbors.begin() + j);
+                break; }  } }
+
+    // Step 3: Remove target from masterList.
+    for (int i = 0; i < masterList.size(); i++) {
+        if (masterList[i] == target) {
+            masterList.erase(masterList.begin() + i);
+            break; }
+    }
+
+    //if target was the entry point, pick a new one.
+    //either the first remaining node, or nullptr if the graph is now empty.
+    if (entryPoint == target) {
+        if (!masterList.empty()) {
+            entryPoint = masterList[0];} 
+        else {
+            entryPoint = nullptr; }  }
+
+    //free mem from heap
+    delete target;
+}
+
 // getEntryPoint()
 // Return the current entry point for search.
-// Returns nullptr if the graph has no nodes yet.
-// ------------------------------------------------------------
 Node* NSWGraph::getEntryPoint() const {
     return entryPoint;
 }
 
-// ------------------------------------------------------------
+
 // setEntryPoint(node)
-// Update the entry point to a new node.
-// Called by Shaheer's insert() after creating a new node.
-//
-// Viva Defense:
-//   "It is the starting node for the search. We update it to
-//    the newest node to ensure recent additions are easily
-//    reachable."
-// ------------------------------------------------------------
+// Update the entry point to a currernt node.
+
 void NSWGraph::setEntryPoint(Node* node) {
     entryPoint = node;
 }
 
-// ------------------------------------------------------------
 // getNodeCount()
 // Return the total number of nodes currently in the graph.
-// ------------------------------------------------------------
+
 int NSWGraph::getNodeCount() const {
-    return static_cast<int>(masterList.size());
+    return static_cast<int>(masterList.size()); //static cast to keep global count
+    //return masterList.size();
 }
 
-// ------------------------------------------------------------
 // getAllNodes()
 // Return a const reference to the master list.
-// Used by Shaheer for brute-force baseline comparison.
-// ------------------------------------------------------------
+
 const vector<Node*>& NSWGraph::getAllNodes() const {
     return masterList;
 }

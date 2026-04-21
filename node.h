@@ -1,35 +1,35 @@
 #ifndef NODE_H
 #define NODE_H
 
-// ============================================================
-// node.h — Graph Node Structure
-// Owner: Areeba (Graph Structure & Memory Specialist)
+// node.h — Graph Node Structure - Areeba part
 //
 // Defines a single node in the NSW graph.
 // Each node stores:
-//   - The original text string
-//   - Its numerical vector (output of Arqish's vectorize())
-//   - A list of pointers to neighboring nodes (adjacency list)
-// ============================================================
+// The original text string
+// Its numerical vector (output from vectorize)
+// A list of pointers to neighboring nodes (adjacency list)
 
 #include <string>
 #include <vector>
 
 using namespace std;
 
-struct Node {
-    // Original note text that the user inserted
-    string text;
+class Node{
+    // user input for that node (a word)
+    public:
+        string text;
 
-    // Numerical "fingerprint" vector — output of Arqish's vectorize()
-    vector<double> numericalVector;
+        //vectorized  output of the text
+        vector<double> numericalVector;
 
-    // Adjacency list — pointers to connected nodes in the graph
-    vector<Node*> neighbors;
+        //adjacency list of neighbors of node
+        vector<Node*> neighbors;
 
-    // Constructor: initializes a node with text and its vector
-    Node(string t, vector<double> vec)
-        : text(t), numericalVector(vec) {}
+        // Constructor: initializes a node with text and its vector
+        Node(const string& inputText, const vector<double>& inputVector) {
+        text = inputText;
+        numericalVector = inputVector;
+    }
 };
 
-#endif // NODE_H
+#endif 
