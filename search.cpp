@@ -1,161 +1,137 @@
-// ============================================================
-// search.cpp — Greedy Search Algorithm (Implementation)
-// Owner: Member 3 (Search Algorithm & Complexity Specialist)
-//
-// SKELETON CODE — Member 3 must implement the TODO sections.
-// Each function has detailed comments explaining the logic.
-// ============================================================
-
 #include "search.h"
-#include "vectorizer.h"    // Member 1's cosineDistance()
-#include "config.h"
-#include <queue>           // std::priority_queue
-#include <unordered_set>   // std::unordered_set
-#include <algorithm>       // std::sort
-#include <functional>      // std::greater for min-heap
 
-// ------------------------------------------------------------
-// search(graph, queryVector, k, efSearch)
-//
-// Greedy best-first search on the NSW graph.
-//
-// HOW IT WORKS:
-//   Imagine you're in a dark room and can only see your
-//   immediate neighbors. You want to find the person most
-//   similar to you. You ask each neighbor "are you closer
-//   to my target?" and move toward the one who says yes.
-//   You keep doing this until nobody is closer than where
-//   you're standing. That's the greedy part.
-//
-//   The efSearch parameter makes it smarter: instead of only
-//   following the ONE closest neighbor, you keep a "beam" of
-//   efSearch candidates. This prevents getting stuck in a
-//   dead end (local minimum).
-//
-// DELETION HANDLING:
-//   When we encounter a deleted node during the search:
-//   - We do NOT add it to results
-//   - But we DO explore its neighbors (the edges are still valid)
-//   - This ensures the graph remains traversable even if a
-//     "bridge" node between two clusters is deleted
-//
-// ALGORITHM (based on Malkov & Yashunin, 2018 — Algorithm 2):
-//   1. Start at the entry point node
-//   2. Calculate distance from query to entry point
-//   3. Add entry point to candidates (min-heap, closest first)
-//   4. Add entry point to visited set
-//   5. While candidates is not empty:
-//      a. Pop the closest candidate (call it 'current')
-//      b. Get the worst ACTIVE result in our top-K list
-//      c. If currentDist > worstDist, STOP (early stopping)
-//      d. For each neighbor of 'current':
-//         - If not visited:
-//           - Calculate distance to neighbor
-//           - Add to visited
-//           - If neighbor is NOT deleted AND closer than worst result:
-//               - Add neighbor to results
-//           - Add neighbor to candidates (even if deleted, for traversal)
-//   6. Sort results by distance and return top K
-//
-// TIME COMPLEXITY: O(log N) average case (Small World property)
-// SPACE COMPLEXITY: O(efSearch) for the candidate/visited sets
-//
-// Viva Defense:
-//   "Ideally O(log N). Because of the 'Small World' property,
-//    we reach the target in a small number of hops, unlike
-//    linear scan O(N)."
-//
-// PRIORITY QUEUE SETUP:
-//   - Candidates: Min-Heap (explore closest first)
-//     Use std::priority_queue with greater<> comparator
-//   - Results: Managed as a sorted vector, keeping only top K
-// ------------------------------------------------------------
-vector<SearchResult> search(
+#include <queue>
+#include <unordered_set>
+#include <algorithm>
+#include "vectorizer.h"
+using namespace std;
+
+
+// general priority queue syntax from the library priority_queue<Type,Container,Comparator>
+
+//////////////////////////////////////////
+//         MAIN SEARCH FUNCTION         //
+//////////////////////////////////////////
+vector<SearchResult> search(NSWGraph* graph,const vector<double>& queryVector,int k,int efSearch){
+    vector<SearchResult> final_results; //where we will keep our answers
+
+    //first we shall check for an important  condition which is to check if graph empty
+    Node* entry_node= graph->getEntryPoint(); //we will need this to begin our search
+
+    if ((graph==nullptr) || (entry_node==nullptr)){ return {};}
+
+    //now we create a priority queue for min heap
+    priority_queue < pair<double,Node*>,vector<pair<double, Node*>>,greater<pair<double, Node*>>> candidates_min;
+    priority_queue<pair<double, Node*>> results; //max heap for results to have an early stop
+    unordered_set<Node*> visited_nodes; //just use a USET for visited nodes
+    double distance= cosineDistance(queryVector,entry_node->numericalVector); // we will use distance to implement our greedy search
+
+    //now we will push our first entry to min and max heap
+
+    candidates_min.push({distance,entry_node}); 
+    results.push({distance,entry_node});
+    visited_nodes.insert(entry_node); //it is now visited too
+
+    while (!candidates_min.empty()){
+        pair<double,Node*> current = candidates_min.top(); 
+        candidates_min.pop(); //get the smallest distance node of this node we have popped
+
+        Node* current_node = current.second;
+        double current_dist = current.first;
+
+        // --------------------------------------------------------
+        // EARLY STOPPING — key optimisation for O(log N) behaviour
+        //
+        // results is a MAX-heap so results.top() is always the
+        // WORST (largest distance) result we have found so far.
+        //
+        // If the current candidate is already worse than our worst
+        // result AND we already have K results, every remaining
+        // candidate in the min-heap will also be worse (heap property).
+        // No point continuing — we cannot improve our top-K anymore.
+        // --------------------------------------------------------
+        if ((int)results.size() >= k && current_dist > results.top().first){
+            break;
+        }
+
+        for (int i = 0; i < (int)current_node->neighbors.size(); i++){ //loop through to find the neighbours of a node
+            if (visited_nodes.count(current_node->neighbors[i]) == 0){ // not visited before (count tells existence in unordered set, 1 if exists 0 otherwise)
+                    
+                    visited_nodes.insert(current_node->neighbors[i]); //mark it visited since its visited now
+
+                    double distance_2 = cosineDistance(queryVector, current_node->neighbors[i]->numericalVector); //calc distance between query vector and current neighbour
+                    
+                    // --------------------------------------------------------
+                    // efSearch controls the beam width of the search.
+                    // We only add a neighbor to candidates if we have not yet
+                    // reached efSearch candidates, OR if this neighbor is
+                    // closer than our current worst result.
+                    // This prevents the candidate heap from growing too large
+                    // and keeps the search focused on promising nodes.
+                    // --------------------------------------------------------
+                    if ((int)candidates_min.size() < efSearch || distance_2 < results.top().first){
+                        candidates_min.push({distance_2, current_node->neighbors[i]});
+                    }
+
+                    if ((int)results.size() < k){
+                        results.push({distance_2, current_node->neighbors[i]});
+                    }
+                    else if (distance_2 < results.top().first){
+                        results.pop();
+                        results.push({distance_2, current_node->neighbors[i]});
+                    }
+            }
+        }
+    }
+
+    while (!results.empty()){
+        final_results.push_back({ //use max heap to get final results
+            
+            results.top().second->text,
+            results.top().first
+        });
+        results.pop();
+    }
+
+    reverse(final_results.begin(), final_results.end()); //because max heap gives worst to best, we reverse to get best to worst
+    return final_results;
+}
+
+
+// ============================================================
+// bruteForceSearch()
+// Scans every node in the graph linearly — O(N).
+// Used ONLY for benchmarking: run this alongside search() on
+// datasets of increasing size to prove NSW is faster.
+// Also useful as a correctness check — results should roughly
+// match search() output.
+// ============================================================
+vector<SearchResult> bruteForceSearch(
     NSWGraph* graph,
     const vector<double>& queryVector,
-    int k,
-    int efSearch
+    int k
 ) {
     vector<SearchResult> results;
 
-    // TODO: Member 3 — Implement the empty graph guard
-    //
-    // if (graph == nullptr || graph->getEntryPoint() == nullptr || k <= 0) {
-    //     return results; // empty
-    // }
-    return results; // Placeholder — replace with actual implementation
+    if (graph == nullptr) return results;
 
-    // TODO: Member 3 — Implement the greedy search algorithm
-    //
-    // Step 1: Get the entry point
-    // Node* current = graph->getEntryPoint();
-    //
-    // Step 2: Create data structures
-    // std::unordered_set<Node*> visited;
-    // // Min-heap: pair<distance, Node*>, smallest distance on top
-    // std::priority_queue<
-    //     pair<double, Node*>,
-    //     vector<pair<double, Node*>>,
-    //     greater<pair<double, Node*>>
-    // > candidates;
-    //
-    // Step 3: Initialize with entry point
-    // double startDist = cosineDistance(queryVector, current->numericalVector);
-    // candidates.push({startDist, current});
-    // visited.insert(current);
-    //
-    // Step 4: Keep a list of the best ACTIVE results found so far
-    // // Use a simple vector and sort at the end
-    // vector<pair<double, Node*>> foundResults;
-    //
-    // Step 5: Main search loop
-    // while (!candidates.empty()) {
-    //     // Pop closest candidate
-    //     auto [currentDist, currentPtr] = candidates.top();
-    //     candidates.pop();
-    //
-    //     // Early stopping: if current candidate is worse than
-    //     // the worst ACTIVE result we have (and we have K+ results)
-    //     double worstDist = (foundResults.size() >= (size_t)k)
-    //         ? foundResults.back().first
-    //         : 999999.0;
-    //     if (currentDist > worstDist) break;
-    //
-    //     // Explore neighbors
-    //     for (Node* neighbor : currentPtr->neighbors) {
-    //         if (visited.count(neighbor) > 0) continue; // already visited
-    //         visited.insert(neighbor);
-    //
-    //         double neighborDist = cosineDistance(
-    //             queryVector, neighbor->numericalVector
-    //         );
-    //
-    //         // Always add to candidates (even deleted nodes,
-    //         // so we can traverse through them to reach other nodes)
-    //         candidates.push({neighborDist, neighbor});
-    //
-    //         // Only add ACTIVE nodes to results
-    //         if (!neighbor->is_deleted) {
-    //             foundResults.push_back({neighborDist, neighbor});
-    //         }
-    //
-    //         // Keep foundResults at most efSearch size
-    //         // (trim the worst ones if we exceed efSearch)
-    //         // Hint: sort and resize
-    //     }
-    // }
-    //
-    // Step 6: Sort foundResults by distance (closest first)
-    // std::sort(foundResults.begin(), foundResults.end());
-    //
-    // Step 7: Take top K and convert to SearchResult
-    // for (int i = 0; i < k && i < (int)foundResults.size(); i++) {
-    //     results.push_back({
-    //         foundResults[i].second->text,
-    //         foundResults[i].first,
-    //         foundResults[i].second->id
-    //     });
-    // }
-    //
-    // return results;
+    const vector<Node*>& nodes = graph->getAllNodes();
+
+    for (Node* node : nodes) {
+
+        double dist = cosineDistance(queryVector, node->numericalVector);
+
+        results.push_back({node->text, dist});
+    }
+
+    sort(results.begin(), results.end(),
+         [](const SearchResult& a, const SearchResult& b) {
+             return a.distance < b.distance;
+         });
+
+    if (results.size() > (size_t)k) {
+        results.resize(k);
+    }
+
+    return results;
 }
