@@ -1,8 +1,8 @@
 // ============================================================
 // main.cpp — NSW Project Test Harness
 //
-// TEMPORARY FILE — Shaheer will replace this with the full CLI.
-// Right now, this file tests Shaheer's functions and verifies
+// TEMPORARY FILE — Member 4 will replace this with the full CLI.
+// Right now, this file tests Member 1's 4 functions and verifies
 // that the full project skeleton compiles together cleanly.
 //
 // Compile:  g++ -std=c++17 -o test main.cpp vectorizer.cpp nsw_graph.cpp search.cpp
@@ -309,8 +309,12 @@ void testSkeletonCompilation() {
     NSWGraph graph;
     cout << "\n  NSWGraph created successfully." << endl;
     cout << "  Node count: " << graph.getNodeCount() << endl;
+    cout << "  Active nodes: " << graph.getActiveNodeCount() << endl;
+    cout << "  Deleted nodes: " << graph.getDeletedNodeCount() << endl;
     cout << "  Entry point: " << (graph.getEntryPoint() == nullptr ? "nullptr (correct)" : "ERROR") << endl;
     assert(graph.getNodeCount() == 0);
+    assert(graph.getActiveNodeCount() == 0);
+    assert(graph.getDeletedNodeCount() == 0);
     assert(graph.getEntryPoint() == nullptr);
     cout << "  [PASS] NSWGraph compiles and initializes correctly." << endl;
 
@@ -331,6 +335,132 @@ void testSkeletonCompilation() {
 }
 
 // ------------------------------------------------------------
+// TEST 7: Lazy Deletion
+// Tests the removeNode() function and verifies:
+//   - Nodes can be marked as deleted
+//   - Deleted nodes are excluded from active count
+//   - Entry point is reassigned when deleted
+//   - Deleting all nodes leaves graph empty
+//   - Double-deletion returns false
+//   - Deleting nullptr returns false
+//   - findNodeById() works
+// ------------------------------------------------------------
+void testLazyDeletion() {
+    cout << "\n========================================" << endl;
+    cout << "TEST 7: Lazy Deletion" << endl;
+    cout << "========================================" << endl;
+
+    NSWGraph graph;
+
+    // Create 3 nodes manually (bypassing createNode since it's skeleton)
+    vector<double> vec1 = vectorize("data structures");
+    vector<double> vec2 = vectorize("machine learning");
+    vector<double> vec3 = vectorize("operating systems");
+
+    Node* n0 = new Node(0, "data structures", vec1);
+    Node* n1 = new Node(1, "machine learning", vec2);
+    Node* n2 = new Node(2, "operating systems", vec3);
+
+    // Add edges manually
+    n0->neighbors.push_back(n1);
+    n1->neighbors.push_back(n0);
+    n1->neighbors.push_back(n2);
+    n2->neighbors.push_back(n1);
+
+    // Set entry point
+    graph.setEntryPoint(n2);
+    cout << "\n  Setup: 3 nodes created, entry point = node 2" << endl;
+
+    // --- Test 7a: findNodeById ---
+    // NOTE: findNodeById searches masterList, which is only populated
+    // by createNode(). Since we created nodes manually here for testing,
+    // they won't be found. This test verifies the function compiles and
+    // returns nullptr for untracked nodes. Full test after Member 2
+    // implements createNode().
+    cout << "\n  --- findNodeById ---" << endl;
+    Node* found = graph.findNodeById(1);
+    cout << "  findNodeById(1) = " << (found ? found->text : "nullptr") << endl;
+    cout << "  (Returns nullptr because nodes were created manually," << endl;
+    cout << "   not via createNode(). Will work after Member 2 implements.)" << endl;
+
+    Node* notFound = graph.findNodeById(99);
+    cout << "  findNodeById(99) = " << (notFound ? "ERROR" : "nullptr") << " (correct)" << endl;
+    assert(notFound == nullptr);
+    cout << "  [PASS] findNodeById compiles and returns nullptr for unknown IDs." << endl;
+
+    // --- Test 7b: Delete a non-entry-point node ---
+    cout << "\n  --- Delete node 1 (non-entry-point) ---" << endl;
+    bool deleted = graph.removeNode(n1);
+    cout << "  removeNode(n1) returned: " << (deleted ? "true" : "false") << endl;
+    assert(deleted == true);
+    assert(n1->is_deleted == true);
+    cout << "  n1->is_deleted = " << (n1->is_deleted ? "true" : "false") << endl;
+    cout << "  Entry point still node 2: " << (graph.getEntryPoint() == n2 ? "true" : "false") << endl;
+    assert(graph.getEntryPoint() == n2); // Entry point unchanged
+    cout << "  [PASS] Non-entry-point node deleted, entry point unchanged." << endl;
+
+    // --- Test 7c: Double deletion ---
+    cout << "\n  --- Double deletion of node 1 ---" << endl;
+    bool deletedAgain = graph.removeNode(n1);
+    cout << "  removeNode(n1) again returned: " << (deletedAgain ? "true (ERROR)" : "false") << endl;
+    assert(deletedAgain == false);
+    cout << "  [PASS] Double deletion returns false." << endl;
+
+    // --- Test 7d: Delete the entry point ---
+    cout << "\n  --- Delete node 2 (entry point) ---" << endl;
+    bool deleted2 = graph.removeNode(n2);
+    cout << "  removeNode(n2) returned: " << (deleted2 ? "true" : "false") << endl;
+    assert(deleted2 == true);
+    assert(n2->is_deleted == true);
+    cout << "  n2->is_deleted = " << (n2->is_deleted ? "true" : "false") << endl;
+    // NOTE: removeNode() reassigns entry point by searching masterList.
+    // Since we created nodes manually (not via createNode()), masterList
+    // is empty, so entry point becomes nullptr. This is correct behavior.
+    // After Member 2 implements createNode(), it will find n0 in masterList
+    // and auto-reassign properly.
+    cout << "  Entry point after deleting untracked entry: "
+         << (graph.getEntryPoint() == nullptr ? "nullptr" : "ERROR") << endl;
+    assert(graph.getEntryPoint() == nullptr);
+    cout << "  [PASS] Entry point correctly unset (masterList is empty)." << endl;
+    cout << "  (After Member 2 implements createNode(), auto-reassign works.)" << endl;
+
+    // --- Test 7e: Delete nullptr ---
+    cout << "\n  --- Delete nullptr ---" << endl;
+    bool deletedNull = graph.removeNode(nullptr);
+    cout << "  removeNode(nullptr) returned: " << (deletedNull ? "true (ERROR)" : "false") << endl;
+    assert(deletedNull == false);
+    cout << "  [PASS] nullptr deletion returns false." << endl;
+
+    // --- Test 7f: Edges still exist after deletion ---
+    cout << "\n  --- Edge preservation check ---" << endl;
+    cout << "  n0->neighbors.size() = " << n0->neighbors.size()
+         << " (expected: 1, still pointing to deleted n1)" << endl;
+    assert(n0->neighbors.size() == 1);
+    assert(n0->neighbors[0] == n1); // Edge to deleted node still exists
+    cout << "  n1->neighbors.size() = " << n1->neighbors.size()
+         << " (expected: 2, still intact)" << endl;
+    assert(n1->neighbors.size() == 2); // Deleted node's edges preserved
+    cout << "  [PASS] Edges preserved after lazy deletion." << endl;
+
+    // --- Test 7g: Search skips deleted nodes ---
+    cout << "\n  --- Search skips deleted nodes ---" << endl;
+    vector<double> queryVec = vectorize("data algo");
+    vector<SearchResult> results = search(&graph, queryVec, 5, EF_SEARCH);
+    // The search skeleton returns empty, but once Member 3 implements it,
+    // deleted nodes (n1, n2) should NOT appear in results.
+    // Only n0 ("data structures") should be returned.
+    cout << "  Search results count: " << results.size()
+         << " (skeleton returns 0, will work after Member 3 implements)" << endl;
+    cout << "  [PASS] Search compilation check (full test after Member 3)." << endl;
+
+    // --- Cleanup ---
+    delete n0;
+    delete n1;
+    delete n2;
+    cout << "\n  [ALL DELETION TESTS PASSED]" << endl;
+}
+
+// ------------------------------------------------------------
 // MAIN
 // ------------------------------------------------------------
 int main() {
@@ -338,8 +468,9 @@ int main() {
     cout << "  NSW Project — Full Skeleton Test Suite" << endl;
     cout << "  Member 1: getTrigrams, hashTrigram, vectorize," << endl;
     cout << "             cosineDistance" << endl;
-    cout << "  Member 2: NSWGraph (skeleton)" << endl;
+    cout << "  Member 2: NSWGraph (skeleton) + Lazy Deletion" << endl;
     cout << "  Member 3: search() (skeleton)" << endl;
+    cout << "  Member 4: WAITING (needs Members 2 & 3)" << endl;
     cout << "================================================" << endl;
 
     testGetTrigrams();
@@ -348,16 +479,17 @@ int main() {
     testCosineDistance();
     testEndToEnd();
     testSkeletonCompilation();
+    testLazyDeletion();
 
     cout << "\n================================================" << endl;
     cout << "  ALL TESTS PASSED!" << endl;
     cout << "  Member 1: COMPLETE" << endl;
     cout << "  Member 2: SKELETON READY (fill in TODOs)" << endl;
+    cout << "             removeNode() DONE (lazy deletion)" << endl;
     cout << "  Member 3: SKELETON READY (fill in TODOs)" << endl;
+    cout << "             (deletion skip logic documented)" << endl;
     cout << "  Member 4: WAITING (needs Members 2 & 3)" << endl;
     cout << "================================================" << endl;
 
     return 0;
 }
-
-// g++ -std=c++17 -Wall -Wextra -o test main.cpp vectorizer.cpp nsw_graph.cpp search.cpp

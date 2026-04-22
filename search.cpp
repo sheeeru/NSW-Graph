@@ -1,13 +1,13 @@
 // ============================================================
 // search.cpp — Greedy Search Algorithm (Implementation)
-// Owner: Hira (Search Algorithm & Complexity Specialist)
+// Owner: Member 3 (Search Algorithm & Complexity Specialist)
 //
-// SKELETON CODE — Hira must implement the TODO sections.
+// SKELETON CODE — Member 3 must implement the TODO sections.
 // Each function has detailed comments explaining the logic.
 // ============================================================
 
 #include "search.h"
-#include "vectorizer.h"    // Arqish's cosineDistance()
+#include "vectorizer.h"    // Member 1's cosineDistance()
 #include "config.h"
 #include <queue>           // std::priority_queue
 #include <unordered_set>   // std::unordered_set
@@ -32,6 +32,13 @@
 //   efSearch candidates. This prevents getting stuck in a
 //   dead end (local minimum).
 //
+// DELETION HANDLING:
+//   When we encounter a deleted node during the search:
+//   - We do NOT add it to results
+//   - But we DO explore its neighbors (the edges are still valid)
+//   - This ensures the graph remains traversable even if a
+//     "bridge" node between two clusters is deleted
+//
 // ALGORITHM (based on Malkov & Yashunin, 2018 — Algorithm 2):
 //   1. Start at the entry point node
 //   2. Calculate distance from query to entry point
@@ -39,15 +46,15 @@
 //   4. Add entry point to visited set
 //   5. While candidates is not empty:
 //      a. Pop the closest candidate (call it 'current')
-//      b. Get the worst result in our top-K list (call it 'worstDist')
+//      b. Get the worst ACTIVE result in our top-K list
 //      c. If currentDist > worstDist, STOP (early stopping)
 //      d. For each neighbor of 'current':
 //         - If not visited:
 //           - Calculate distance to neighbor
 //           - Add to visited
-//           - If neighbor is closer than worst result (or we have < K results):
-//               - Add neighbor to candidates
+//           - If neighbor is NOT deleted AND closer than worst result:
 //               - Add neighbor to results
+//           - Add neighbor to candidates (even if deleted, for traversal)
 //   6. Sort results by distance and return top K
 //
 // TIME COMPLEXITY: O(log N) average case (Small World property)
@@ -71,14 +78,14 @@ vector<SearchResult> search(
 ) {
     vector<SearchResult> results;
 
-    // TODO: Hira — Implement the empty graph guard
+    // TODO: Member 3 — Implement the empty graph guard
     //
     // if (graph == nullptr || graph->getEntryPoint() == nullptr || k <= 0) {
     //     return results; // empty
     // }
     return results; // Placeholder — replace with actual implementation
 
-    // TODO: Hira — Implement the greedy search algorithm
+    // TODO: Member 3 — Implement the greedy search algorithm
     //
     // Step 1: Get the entry point
     // Node* current = graph->getEntryPoint();
@@ -97,7 +104,7 @@ vector<SearchResult> search(
     // candidates.push({startDist, current});
     // visited.insert(current);
     //
-    // Step 4: Keep a list of the best results found so far
+    // Step 4: Keep a list of the best ACTIVE results found so far
     // // Use a simple vector and sort at the end
     // vector<pair<double, Node*>> foundResults;
     //
@@ -108,7 +115,7 @@ vector<SearchResult> search(
     //     candidates.pop();
     //
     //     // Early stopping: if current candidate is worse than
-    //     // the worst result we have (and we already have K results)
+    //     // the worst ACTIVE result we have (and we have K+ results)
     //     double worstDist = (foundResults.size() >= (size_t)k)
     //         ? foundResults.back().first
     //         : 999999.0;
@@ -123,8 +130,14 @@ vector<SearchResult> search(
     //             queryVector, neighbor->numericalVector
     //         );
     //
-    //         foundResults.push_back({neighborDist, neighbor});
+    //         // Always add to candidates (even deleted nodes,
+    //         // so we can traverse through them to reach other nodes)
     //         candidates.push({neighborDist, neighbor});
+    //
+    //         // Only add ACTIVE nodes to results
+    //         if (!neighbor->is_deleted) {
+    //             foundResults.push_back({neighborDist, neighbor});
+    //         }
     //
     //         // Keep foundResults at most efSearch size
     //         // (trim the worst ones if we exceed efSearch)
@@ -139,7 +152,8 @@ vector<SearchResult> search(
     // for (int i = 0; i < k && i < (int)foundResults.size(); i++) {
     //     results.push_back({
     //         foundResults[i].second->text,
-    //         foundResults[i].first
+    //         foundResults[i].first,
+    //         foundResults[i].second->id
     //     });
     // }
     //
