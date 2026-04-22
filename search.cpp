@@ -20,6 +20,7 @@ vector<SearchResult> search(NSWGraph* graph,const vector<double>& queryVector,in
 
     Node* entry_node= graph->getEntryPoint(); //we will need this to begin our search
 
+    if (entry_node == nullptr) { return {}; } 
 
     //now we create a priority queue for min heap
     priority_queue < pair<double,Node*>,vector<pair<double, Node*>>,greater<pair<double, Node*>>> candidates_min;
@@ -114,7 +115,7 @@ vector<SearchResult> bruteForceSearch(
 ) {
     vector<SearchResult> results;
 
-    if (graph == nullptr) return results;
+    if (graph == nullptr || k <= 0) return results;
 
     const vector<Node*>& nodes = graph->getAllNodes();
 
