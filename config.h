@@ -3,7 +3,7 @@
 
 // ============================================================
 // config.h — Shared Constants for NSW Project
-// Owner: Shaheer (Integration)
+// Owner: Member 4 (Integration)
 // Everyone #includes this file for consistent parameters.
 // ============================================================
 

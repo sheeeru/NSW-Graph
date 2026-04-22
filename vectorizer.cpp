@@ -1,6 +1,6 @@
 // ============================================================
 // vectorizer.cpp — Input Processing Layer (Implementation)
-// Owner: Arqish (Vectorization & Math Specialist)
+// Owner: Member 1 (Vectorization & Math Specialist)
 //
 // This file implements all text-to-vector conversion functions
 // and the cosine distance metric used for comparing vectors.

@@ -3,7 +3,7 @@
 //
 // TEMPORARY FILE — Member 4 will replace this with the full CLI.
 // Right now, this file tests Member 1's 4 functions and verifies
-// that the full project skeleton compiles together cleanly.
+// that the full project compiles together cleanly.
 //
 // Compile:  g++ -std=c++17 -o test main.cpp vectorizer.cpp nsw_graph.cpp search.cpp
 // Run:      ./test
@@ -296,168 +296,530 @@ void testEndToEnd() {
 }
 
 // ------------------------------------------------------------
-// TEST 6: Skeleton compilation check (Member 2 & 3)
-// Verifies the graph and search headers link properly.
-// This test will be expanded once Members 2 & 3 implement.
+// TEST 6: Graph Operations (createNode, addEdge, printGraph)
+// Tests Member 2's graph functions (now FULLY IMPLEMENTED)
 // ------------------------------------------------------------
-void testSkeletonCompilation() {
+void testGraphOperations() {
     cout << "\n========================================" << endl;
-    cout << "TEST 6: Skeleton Compilation Check" << endl;
+    cout << "TEST 6: Graph Operations (Member 2)" << endl;
     cout << "========================================" << endl;
 
-    // Verify NSWGraph can be instantiated (Member 2's class)
     NSWGraph graph;
-    cout << "\n  NSWGraph created successfully." << endl;
-    cout << "  Node count: " << graph.getNodeCount() << endl;
-    cout << "  Active nodes: " << graph.getActiveNodeCount() << endl;
-    cout << "  Deleted nodes: " << graph.getDeletedNodeCount() << endl;
-    cout << "  Entry point: " << (graph.getEntryPoint() == nullptr ? "nullptr (correct)" : "ERROR") << endl;
+
+    // --- Test 6a: Empty graph ---
+    cout << "\n  --- 6a: Empty graph ---" << endl;
     assert(graph.getNodeCount() == 0);
-    assert(graph.getActiveNodeCount() == 0);
-    assert(graph.getDeletedNodeCount() == 0);
     assert(graph.getEntryPoint() == nullptr);
-    cout << "  [PASS] NSWGraph compiles and initializes correctly." << endl;
+    assert(graph.getAllNodes().empty());
+    cout << "  Node count: 0 (correct)" << endl;
+    cout << "  Entry point: nullptr (correct)" << endl;
+    cout << "  [PASS]" << endl;
 
-    // Verify search function is callable (Member 3's function)
-    // Will return empty vector since graph is empty and function is skeleton
-    vector<double> dummyQuery(VECTOR_DIM, 0.0);
-    vector<SearchResult> results = search(&graph, dummyQuery, 5, EF_SEARCH);
-    cout << "\n  search() called on empty graph." << endl;
-    cout << "  Results: " << results.size() << " (expected: 0)" << endl;
-    assert(results.empty());
-    cout << "  [PASS] search() compiles and handles empty graph." << endl;
+    // --- Test 6b: Create nodes ---
+    cout << "\n  --- 6b: Create nodes via createNode() ---" << endl;
+    Node* n0 = graph.createNode("data structures", vectorize("data structures"));
+    Node* n1 = graph.createNode("machine learning", vectorize("machine learning"));
+    Node* n2 = graph.createNode("operating systems", vectorize("operating systems"));
+    assert(graph.getNodeCount() == 3);
+    cout << "  Created 3 nodes. Node count: " << graph.getNodeCount() << endl;
+    cout << "  [PASS]" << endl;
 
-    // Verify getAllNodes() works (used by Member 4's brute-force)
-    const vector<Node*>& nodes = graph.getAllNodes();
-    assert(nodes.empty());
-    cout << "\n  getAllNodes() returns empty list." << endl;
-    cout << "  [PASS] Member 4's brute-force access point works." << endl;
+    // --- Test 6c: Add edges ---
+    cout << "\n  --- 6c: Add edges ---" << endl;
+    graph.addEdge(n0, n1);  // data <-> machine
+    graph.addEdge(n1, n2);  // machine <-> operating
+    graph.addEdge(n0, n2);  // data <-> operating
+    cout << "  n0 neighbors: " << n0->neighbors.size() << " (expected: 2)" << endl;
+    cout << "  n1 neighbors: " << n1->neighbors.size() << " (expected: 2)" << endl;
+    cout << "  n2 neighbors: " << n2->neighbors.size() << " (expected: 2)" << endl;
+    assert(n0->neighbors.size() == 2);
+    assert(n1->neighbors.size() == 2);
+    assert(n2->neighbors.size() == 2);
+    cout << "  [PASS]" << endl;
+
+    // --- Test 6d: Self-edge prevention ---
+    cout << "\n  --- 6d: Self-edge prevention ---" << endl;
+    graph.addEdge(n0, n0);
+    cout << "  n0 neighbors after self-edge attempt: " << n0->neighbors.size()
+         << " (expected: 2, unchanged)" << endl;
+    assert(n0->neighbors.size() == 2);
+    cout << "  [PASS]" << endl;
+
+    // --- Test 6e: Duplicate edge prevention ---
+    cout << "\n  --- 6e: Duplicate edge prevention ---" << endl;
+    graph.addEdge(n0, n1);  // Already connected
+    cout << "  n0 neighbors after duplicate edge attempt: " << n0->neighbors.size()
+         << " (expected: 2, unchanged)" << endl;
+    assert(n0->neighbors.size() == 2);
+    cout << "  [PASS]" << endl;
+
+    // --- Test 6f: Entry point ---
+    cout << "\n  --- 6f: Entry point ---" << endl;
+    graph.setEntryPoint(n2);
+    assert(graph.getEntryPoint() == n2);
+    cout << "  Entry point set to: \"" << graph.getEntryPoint()->text << "\"" << endl;
+    cout << "  [PASS]" << endl;
+
+    // --- Test 6g: printGraph ---
+    cout << "\n  --- 6g: printGraph() ---" << endl;
+    graph.printGraph();
+    cout << "  [PASS] (visual inspection)" << endl;
+
+    // --- Test 6h: getAllNodes for brute force ---
+    cout << "\n  --- 6h: getAllNodes() for Member 4's brute force ---" << endl;
+    const vector<Node*>& allNodes = graph.getAllNodes();
+    assert(allNodes.size() == 3);
+    cout << "  getAllNodes() returned " << allNodes.size() << " nodes" << endl;
+    cout << "  [PASS]" << endl;
+
+    // --- Test 6i: search on small graph ---
+    cout << "\n  --- 6i: search() on 3-node graph ---" << endl;
+    vector<SearchResult> results = search(&graph, vectorize("data"), 3, EF_SEARCH);
+    cout << "  search() returned " << results.size() << " results" << endl;
+    assert(results.size() == 3); // Should find all 3 nodes
+    cout << "  Top result: \"" << results[0].text << "\" (dist: " << fixed << setprecision(4) << results[0].distance << ")" << endl;
+    assert(results[0].text == "data structures"); // Closest match
+    cout << "  [PASS]" << endl;
+
+    cout << "\n  [ALL GRAPH OPERATION TESTS PASSED]" << endl;
 }
 
 // ------------------------------------------------------------
-// TEST 7: Lazy Deletion
-// Tests the removeNode() function and verifies:
-//   - Nodes can be marked as deleted
-//   - Deleted nodes are excluded from active count
-//   - Entry point is reassigned when deleted
-//   - Deleting all nodes leaves graph empty
-//   - Double-deletion returns false
-//   - Deleting nullptr returns false
-//   - findNodeById() works
+// TEST 7: Hard Deletion
+// Tests the deleteNode() function and verifies:
+//   7a: Node is removed from graph (node count decreases)
+//   7b: Edges to target are removed from neighbors' lists
+//   7c: Neighbors are re-linked to each other (clique)
+//   7d: Entry point is reassigned when deleted
+//   7e: Deleting the only node leaves graph empty
+//   7f: Delete nullptr does nothing
+//   7g: Duplicate edge check prevents issues during relinking
 // ------------------------------------------------------------
-void testLazyDeletion() {
+void testHardDeletion() {
     cout << "\n========================================" << endl;
-    cout << "TEST 7: Lazy Deletion" << endl;
+    cout << "TEST 7: Hard Deletion" << endl;
+    cout << "========================================" << endl;
+
+    // ======== SETUP: 4-node graph ========
+    //    n0 -- n1
+    //    |  \  |
+    //    n2 -- n3
+    //
+    NSWGraph graph;
+    Node* n0 = graph.createNode("apple", vectorize("apple"));
+    Node* n1 = graph.createNode("apply", vectorize("apply"));
+    Node* n2 = graph.createNode("banana", vectorize("banana"));
+    Node* n3 = graph.createNode("orange", vectorize("orange"));
+
+    graph.addEdge(n0, n1);
+    graph.addEdge(n0, n2);
+    graph.addEdge(n0, n3);
+    graph.addEdge(n1, n2);
+    graph.addEdge(n1, n3);
+    graph.addEdge(n2, n3);
+
+    graph.setEntryPoint(n0);
+    cout << "\n  Setup: 4-node fully connected graph (6 edges)" << endl;
+    cout << "  n0 (apple) neighbors: " << n0->neighbors.size() << endl;
+    cout << "  n1 (apply) neighbors: " << n1->neighbors.size() << endl;
+    cout << "  n2 (banana) neighbors: " << n2->neighbors.size() << endl;
+    cout << "  n3 (orange) neighbors: " << n3->neighbors.size() << endl;
+    cout << "  Entry point: " << graph.getEntryPoint()->text << endl;
+    graph.printGraph();
+
+    // --- Test 7a: Delete a non-entry-point node ---
+    cout << "\n  --- 7a: Delete n3 (orange) — non-entry-point ---" << endl;
+    cout << "  Before: node count = " << graph.getNodeCount() << endl;
+    graph.deleteNode(n3);
+    cout << "  After:  node count = " << graph.getNodeCount() << " (expected: 3)" << endl;
+    assert(graph.getNodeCount() == 3);
+    // Entry point should be unchanged (was n0, not n3)
+    assert(graph.getEntryPoint() == n0);
+    cout << "  Entry point still: " << graph.getEntryPoint()->text << " (correct)" << endl;
+    cout << "  [PASS]" << endl;
+
+    // --- Test 7b: Edges to target removed from neighbors ---
+    cout << "\n  --- 7b: Edges to n3 removed from neighbors ---" << endl;
+    // n0 had [n1, n2, n3] → after deleting n3, should be [n1, n2]
+    cout << "  n0 neighbors: " << n0->neighbors.size() << " (expected: 2)" << endl;
+    assert(n0->neighbors.size() == 2);
+    // n1 had [n0, n2, n3] → after deleting n3, should be [n0, n2]
+    cout << "  n1 neighbors: " << n1->neighbors.size() << " (expected: 2)" << endl;
+    assert(n1->neighbors.size() == 2);
+    // n2 had [n0, n1, n3] → after deleting n3, should be [n0, n1]
+    cout << "  n2 neighbors: " << n2->neighbors.size() << " (expected: 2)" << endl;
+    assert(n2->neighbors.size() == 2);
+    cout << "  [PASS] All edges to deleted node removed." << endl;
+
+    // --- Test 7c: Neighbors re-linked ---
+    cout << "\n  --- 7c: Neighbors re-linked (clique formed) ---" << endl;
+    // n3's neighbors were [n0, n1, n2].
+    // Phase 1 of deleteNode tries: addEdge(n0,n1), addEdge(n0,n2), addEdge(n1,n2)
+    // All three already existed → duplicate check prevents adding again.
+    // Verify no duplicate edges exist:
+    bool dupFound = false;
+    for (size_t i = 0; i < n0->neighbors.size(); i++) {
+        for (size_t j = i + 1; j < n0->neighbors.size(); j++) {
+            if (n0->neighbors[i] == n0->neighbors[j]) {
+                dupFound = true;
+            }
+        }
+    }
+    assert(!dupFound);
+    cout << "  No duplicate edges in n0's neighbor list." << endl;
+    cout << "  [PASS]" << endl;
+
+    // --- Test 7d: Delete the entry point ---
+    cout << "\n  --- 7d: Delete n0 (apple) — the entry point ---" << endl;
+    graph.deleteNode(n0);
+    cout << "  Node count: " << graph.getNodeCount() << " (expected: 2)" << endl;
+    assert(graph.getNodeCount() == 2);
+    // Entry point should be reassigned (first remaining node = n1 or n2)
+    cout << "  New entry point: \""
+         << (graph.getEntryPoint() ? graph.getEntryPoint()->text : "nullptr") << "\"" << endl;
+    assert(graph.getEntryPoint() != nullptr);
+    cout << "  [PASS] Entry point reassigned after deletion." << endl;
+
+    // Verify n1 and n2 are still connected
+    cout << "  n1 neighbors: " << n1->neighbors.size() << " (expected: 1 = n2)" << endl;
+    cout << "  n2 neighbors: " << n2->neighbors.size() << " (expected: 1 = n1)" << endl;
+    assert(n1->neighbors.size() == 1);
+    assert(n2->neighbors.size() == 1);
+    assert(n1->neighbors[0] == n2);
+    assert(n2->neighbors[0] == n1);
+    cout << "  [PASS] n1 and n2 remain connected after n0 deletion." << endl;
+
+    graph.printGraph();
+
+    // --- Test 7e: Delete until graph is empty ---
+    cout << "\n  --- 7e: Delete remaining nodes until empty ---" << endl;
+    graph.deleteNode(n1);
+    cout << "  After deleting n1: count = " << graph.getNodeCount() << endl;
+    assert(graph.getNodeCount() == 1);
+
+    graph.deleteNode(n2);
+    cout << "  After deleting n2: count = " << graph.getNodeCount() << endl;
+    assert(graph.getNodeCount() == 0);
+    assert(graph.getEntryPoint() == nullptr);
+    cout << "  Entry point: nullptr (correct, graph is empty)" << endl;
+    cout << "  [PASS] Graph is empty, entry point is nullptr." << endl;
+
+    // --- Test 7f: Delete nullptr ---
+    cout << "\n  --- 7f: Delete nullptr ---" << endl;
+    graph.deleteNode(nullptr); // Should not crash
+    cout << "  deleteNode(nullptr) — no crash." << endl;
+    assert(graph.getNodeCount() == 0);
+    cout << "  [PASS] nullptr deletion handled gracefully." << endl;
+
+    // --- Test 7g: Complex relinking with M limit ---
+    cout << "\n  --- 7g: Relinking under M limit pressure ---" << endl;
+    // Create a star graph: center node connected to many leaves
+    NSWGraph graph2;
+    Node* center = graph2.createNode("center", vectorize("center"));
+    vector<Node*> leaves;
+    for (int i = 0; i < M; i++) {
+        string leafText = "leaf" + to_string(i);
+        Node* leaf = graph2.createNode(leafText, vectorize(leafText));
+        graph2.addEdge(center, leaf);
+        leaves.push_back(leaf);
+    }
+    graph2.setEntryPoint(center);
+    cout << "  Star graph: center + " << M << " leaves" << endl;
+    cout << "  Center neighbors: " << center->neighbors.size() << " (expected: " << M << ")" << endl;
+    assert(center->neighbors.size() == (size_t)M);
+    cout << "  Each leaf neighbors: " << leaves[0]->neighbors.size() << " (expected: 1 = center)" << endl;
+    assert(leaves[0]->neighbors.size() == 1);
+
+    // Delete the center — its M neighbors should try to relink
+    // But each leaf already has 1 neighbor (center), so they have
+    // room for M-1 = 15 more. With M=16 leaves, each pair can connect.
+    cout << "\n  Deleting center node..." << endl;
+    graph2.deleteNode(center);
+    cout << "  Remaining nodes: " << graph2.getNodeCount() << " (expected: " << M << ")" << endl;
+    assert(graph2.getNodeCount() == M);
+
+    // Check that leaves now have multiple neighbors (relinked)
+    cout << "  Leaf 0 neighbors: " << leaves[0]->neighbors.size() << endl;
+    cout << "  (Some relinking edges created, limited by M)" << endl;
+    // Each leaf can have at most M=16 neighbors. With 15 other leaves,
+    // they should get connected to many (up to M=16 - but leaf0 already
+    // lost its edge to center during Phase 2, so it has room for 16).
+    assert(leaves[0]->neighbors.size() > 0); // At least some relinking happened
+    cout << "  [PASS] Relinking works under M limit." << endl;
+
+    // Verify no dangling pointers (no neighbor points to center)
+    bool danglingFound = false;
+    const vector<Node*>& remainingNodes = graph2.getAllNodes();
+    for (Node* node : remainingNodes) {
+        for (Node* nb : node->neighbors) {
+            // Every neighbor should be in the remaining graph
+            bool foundInGraph = false;
+            for (Node* n : remainingNodes) {
+                if (nb == n) { foundInGraph = true; break; }
+            }
+            if (!foundInGraph) danglingFound = true;
+        }
+    }
+    assert(!danglingFound);
+    cout << "  [PASS] No dangling pointers after deletion." << endl;
+
+    // --- Test 7h: Duplicate edge prevention during multi-deletion ---
+    cout << "\n  --- 7h: No duplicate edges after multiple deletions ---" << endl;
+    for (Node* node : remainingNodes) {
+        for (size_t i = 0; i < node->neighbors.size(); i++) {
+            for (size_t j = i + 1; j < node->neighbors.size(); j++) {
+                assert(node->neighbors[i] != node->neighbors[j]);
+            }
+        }
+    }
+    cout << "  Verified: no duplicate neighbors in any node." << endl;
+    cout << "  [PASS]" << endl;
+
+    cout << "\n  [ALL HARD DELETION TESTS PASSED]" << endl;
+}
+
+// ------------------------------------------------------------
+// MAIN
+// ------------------------------------------------------------
+// ------------------------------------------------------------
+// TEST 8: NSW Graph Search
+// Tests Member 3's fully implemented search() function.
+// Verifies correct results, different k values, and edge cases.
+// ------------------------------------------------------------
+void testNSWSearch() {
+    cout << "\n========================================" << endl;
+    cout << "TEST 8: NSW Graph Search (Member 3)" << endl;
+    cout << "========================================" << endl;
+
+    // --- Test 8a: Search on empty graph ---
+    cout << "\n  --- 8a: Search on empty graph ---" << endl;
+    NSWGraph emptyGraph;
+    vector<SearchResult> r0 = search(&emptyGraph, vectorize("test"), 5, EF_SEARCH);
+    assert(r0.empty());
+    cout << "  search() on empty graph: 0 results (correct)" << endl;
+    cout << "  [PASS]" << endl;
+
+    // --- Test 8b: Search on single-node graph ---
+    cout << "\n  --- 8b: Search on single-node graph ---" << endl;
+    NSWGraph singleGraph;
+    singleGraph.createNode("hello world", vectorize("hello world"));
+    singleGraph.setEntryPoint(singleGraph.getAllNodes()[0]);
+    vector<SearchResult> r1 = search(&singleGraph, vectorize("hello"), 3, EF_SEARCH);
+    assert(r1.size() == 1);
+    assert(r1[0].text == "hello world");
+    cout << "  Result: \"" << r1[0].text << "\" (dist: " << fixed << setprecision(4) << r1[0].distance << ")" << endl;
+    cout << "  [PASS]" << endl;
+
+    // --- Test 8c: Search finds the closest match on multi-node graph ---
+    cout << "\n  --- 8c: Correct ranking on multi-node graph ---" << endl;
+    NSWGraph graph;
+    vector<Node*> nodes;
+    vector<string> texts = {
+        "data structures and algorithms",
+        "machine learning basics",
+        "database management systems",
+        "computer networks and security",
+        "operating system concepts",
+        "data science with python",
+        "discrete mathematics",
+        "software engineering principles"
+    };
+    for (const string& t : texts) {
+        Node* n = graph.createNode(t, vectorize(t));
+        nodes.push_back(n);
+    }
+    // Connect as a chain (simple but connected)
+    for (size_t i = 0; i < nodes.size() - 1; i++) {
+        graph.addEdge(nodes[i], nodes[i + 1]);
+    }
+    // Add a few extra edges for better connectivity (skip connections)
+    graph.addEdge(nodes[0], nodes[3]);
+    graph.addEdge(nodes[1], nodes[4]);
+    graph.addEdge(nodes[2], nodes[5]);
+    graph.addEdge(nodes[0], nodes[6]);
+    graph.addEdge(nodes[3], nodes[7]);
+    graph.setEntryPoint(nodes.back());
+
+    string query = "data structures course";
+    vector<SearchResult> r2 = search(&graph, vectorize(query), 3, EF_SEARCH);
+    cout << "  Query: \"" << query << "\"" << endl;
+    cout << "  Top " << r2.size() << " results:" << endl;
+    for (size_t i = 0; i < r2.size(); i++) {
+        cout << "    " << (i + 1) << ". \"" << r2[i].text << "\" (dist: "
+             << fixed << setprecision(6) << r2[i].distance << ")" << endl;
+    }
+    assert(r2.size() == 3);
+    assert(r2[0].text == "data structures and algorithms");
+    cout << "  Top-1 match is correct!" << endl;
+    // Verify results are sorted (ascending distance)
+    for (size_t i = 1; i < r2.size(); i++) {
+        assert(r2[i].distance >= r2[i - 1].distance);
+    }
+    cout << "  Results correctly sorted by distance." << endl;
+    cout << "  [PASS]" << endl;
+
+    // --- Test 8d: k=1 returns exactly 1 result ---
+    cout << "\n  --- 8d: k=1 ---" << endl;
+    vector<SearchResult> r3 = search(&graph, vectorize(query), 1, EF_SEARCH);
+    assert(r3.size() == 1);
+    cout << "  search(k=1) returned " << r3.size() << " result" << endl;
+    cout << "  [PASS]" << endl;
+
+    // --- Test 8e: k > graph size ---
+    cout << "\n  --- 8e: k larger than graph size ---" << endl;
+    vector<SearchResult> r4 = search(&graph, vectorize(query), 100, EF_SEARCH);
+    cout << "  search(k=100) on 8-node graph returned " << r4.size() << " results" << endl;
+    assert(r4.size() <= 8);
+    assert(r4.size() > 0);
+    cout << "  [PASS]" << endl;
+
+    cout << "\n  [ALL NSW SEARCH TESTS PASSED]" << endl;
+}
+
+// ------------------------------------------------------------
+// TEST 9: Search vs Brute Force Comparison
+// Compares NSW graph search with O(N) brute force.
+// NSW should find the same (or very similar) top results.
+// ------------------------------------------------------------
+void testSearchVsBruteForce() {
+    cout << "\n========================================" << endl;
+    cout << "TEST 9: NSW Search vs Brute Force" << endl;
     cout << "========================================" << endl;
 
     NSWGraph graph;
+    vector<string> dataset = {
+        "artificial intelligence and deep learning",
+        "data structures and algorithms",
+        "web development with html css javascript",
+        "computer architecture and organization",
+        "data science and machine learning",
+        "operating systems design principles",
+        "computer networks tcp ip model",
+        "software engineering methodologies",
+        "database management systems sql",
+        "discrete mathematics and graph theory"
+    };
 
-    // Create 3 nodes manually (bypassing createNode since it's skeleton)
-    vector<double> vec1 = vectorize("data structures");
-    vector<double> vec2 = vectorize("machine learning");
-    vector<double> vec3 = vectorize("operating systems");
+    vector<Node*> nodes;
+    for (const string& t : dataset) {
+        Node* n = graph.createNode(t, vectorize(t));
+        nodes.push_back(n);
+    }
+    // Create a well-connected graph (each node connected to next 3)
+    for (size_t i = 0; i < nodes.size(); i++) {
+        for (size_t j = i + 1; j < min(i + 4, nodes.size()); j++) {
+            graph.addEdge(nodes[i], nodes[j]);
+        }
+    }
+    graph.setEntryPoint(nodes.back());
 
-    Node* n0 = new Node(0, "data structures", vec1);
-    Node* n1 = new Node(1, "machine learning", vec2);
-    Node* n2 = new Node(2, "operating systems", vec3);
+    string query = "machine learning and data";
+    vector<double> queryVec = vectorize(query);
+    int k = 3;
 
-    // Add edges manually
-    n0->neighbors.push_back(n1);
-    n1->neighbors.push_back(n0);
-    n1->neighbors.push_back(n2);
-    n2->neighbors.push_back(n1);
+    // Run both searches
+    vector<SearchResult> nswResults = search(&graph, queryVec, k, EF_SEARCH);
+    vector<SearchResult> bfResults = bruteForceSearch(&graph, queryVec, k);
 
-    // Set entry point
-    graph.setEntryPoint(n2);
-    cout << "\n  Setup: 3 nodes created, entry point = node 2" << endl;
+    cout << "\n  Query: \"" << query << "\"" << endl;
+    cout << "  Dataset: " << dataset.size() << " nodes, k=" << k << endl;
 
-    // --- Test 7a: findNodeById ---
-    // NOTE: findNodeById searches masterList, which is only populated
-    // by createNode(). Since we created nodes manually here for testing,
-    // they won't be found. This test verifies the function compiles and
-    // returns nullptr for untracked nodes. Full test after Member 2
-    // implements createNode().
-    cout << "\n  --- findNodeById ---" << endl;
-    Node* found = graph.findNodeById(1);
-    cout << "  findNodeById(1) = " << (found ? found->text : "nullptr") << endl;
-    cout << "  (Returns nullptr because nodes were created manually," << endl;
-    cout << "   not via createNode(). Will work after Member 2 implements.)" << endl;
+    cout << "\n  Brute Force (O(N)) top-" << k << ":" << endl;
+    for (size_t i = 0; i < bfResults.size(); i++) {
+        cout << "    " << (i + 1) << ". \"" << bfResults[i].text << "\" (dist: "
+             << fixed << setprecision(6) << bfResults[i].distance << ")" << endl;
+    }
 
-    Node* notFound = graph.findNodeById(99);
-    cout << "  findNodeById(99) = " << (notFound ? "ERROR" : "nullptr") << " (correct)" << endl;
-    assert(notFound == nullptr);
-    cout << "  [PASS] findNodeById compiles and returns nullptr for unknown IDs." << endl;
+    cout << "\n  NSW Search (O(log N)) top-" << k << ":" << endl;
+    for (size_t i = 0; i < nswResults.size(); i++) {
+        cout << "    " << (i + 1) << ". \"" << nswResults[i].text << "\" (dist: "
+             << fixed << setprecision(6) << nswResults[i].distance << ")" << endl;
+    }
 
-    // --- Test 7b: Delete a non-entry-point node ---
-    cout << "\n  --- Delete node 1 (non-entry-point) ---" << endl;
-    bool deleted = graph.removeNode(n1);
-    cout << "  removeNode(n1) returned: " << (deleted ? "true" : "false") << endl;
-    assert(deleted == true);
-    assert(n1->is_deleted == true);
-    cout << "  n1->is_deleted = " << (n1->is_deleted ? "true" : "false") << endl;
-    cout << "  Entry point still node 2: " << (graph.getEntryPoint() == n2 ? "true" : "false") << endl;
-    assert(graph.getEntryPoint() == n2); // Entry point unchanged
-    cout << "  [PASS] Non-entry-point node deleted, entry point unchanged." << endl;
+    // The NSW top-1 should match brute force top-1
+    cout << "\n  Brute Force #1: \"" << bfResults[0].text << "\"" << endl;
+    cout << "  NSW Search #1:      \"" << nswResults[0].text << "\"" << endl;
+    assert(nswResults[0].text == bfResults[0].text);
+    cout << "  Top-1 results MATCH!" << endl;
 
-    // --- Test 7c: Double deletion ---
-    cout << "\n  --- Double deletion of node 1 ---" << endl;
-    bool deletedAgain = graph.removeNode(n1);
-    cout << "  removeNode(n1) again returned: " << (deletedAgain ? "true (ERROR)" : "false") << endl;
-    assert(deletedAgain == false);
-    cout << "  [PASS] Double deletion returns false." << endl;
+    // Both should return k results
+    assert(nswResults.size() == (size_t)k);
+    assert(bfResults.size() == (size_t)k);
+    cout << "  Both returned " << k << " results." << endl;
+    cout << "  [PASS]" << endl;
 
-    // --- Test 7d: Delete the entry point ---
-    cout << "\n  --- Delete node 2 (entry point) ---" << endl;
-    bool deleted2 = graph.removeNode(n2);
-    cout << "  removeNode(n2) returned: " << (deleted2 ? "true" : "false") << endl;
-    assert(deleted2 == true);
-    assert(n2->is_deleted == true);
-    cout << "  n2->is_deleted = " << (n2->is_deleted ? "true" : "false") << endl;
-    // NOTE: removeNode() reassigns entry point by searching masterList.
-    // Since we created nodes manually (not via createNode()), masterList
-    // is empty, so entry point becomes nullptr. This is correct behavior.
-    // After Member 2 implements createNode(), it will find n0 in masterList
-    // and auto-reassign properly.
-    cout << "  Entry point after deleting untracked entry: "
-         << (graph.getEntryPoint() == nullptr ? "nullptr" : "ERROR") << endl;
-    assert(graph.getEntryPoint() == nullptr);
-    cout << "  [PASS] Entry point correctly unset (masterList is empty)." << endl;
-    cout << "  (After Member 2 implements createNode(), auto-reassign works.)" << endl;
+    cout << "\n  [SEARCH VS BRUTE FORCE COMPARISON PASSED]" << endl;
+}
 
-    // --- Test 7e: Delete nullptr ---
-    cout << "\n  --- Delete nullptr ---" << endl;
-    bool deletedNull = graph.removeNode(nullptr);
-    cout << "  removeNode(nullptr) returned: " << (deletedNull ? "true (ERROR)" : "false") << endl;
-    assert(deletedNull == false);
-    cout << "  [PASS] nullptr deletion returns false." << endl;
+// ------------------------------------------------------------
+// TEST 10: Search After Deletion
+// Verifies that search works correctly after hard deletion.
+// Deleted nodes must NOT appear in results.
+// ------------------------------------------------------------
+void testSearchAfterDeletion() {
+    cout << "\n========================================" << endl;
+    cout << "TEST 10: Search After Deletion" << endl;
+    cout << "========================================" << endl;
 
-    // --- Test 7f: Edges still exist after deletion ---
-    cout << "\n  --- Edge preservation check ---" << endl;
-    cout << "  n0->neighbors.size() = " << n0->neighbors.size()
-         << " (expected: 1, still pointing to deleted n1)" << endl;
-    assert(n0->neighbors.size() == 1);
-    assert(n0->neighbors[0] == n1); // Edge to deleted node still exists
-    cout << "  n1->neighbors.size() = " << n1->neighbors.size()
-         << " (expected: 2, still intact)" << endl;
-    assert(n1->neighbors.size() == 2); // Deleted node's edges preserved
-    cout << "  [PASS] Edges preserved after lazy deletion." << endl;
+    NSWGraph graph;
+    vector<Node*> nodes;
+    vector<string> texts = {
+        "apple fruit",
+        "banana fruit",
+        "carrot vegetable",
+        "dog animal",
+        "elephant animal"
+    };
+    for (const string& t : texts) {
+        Node* n = graph.createNode(t, vectorize(t));
+        nodes.push_back(n);
+    }
+    for (size_t i = 0; i < nodes.size() - 1; i++) {
+        graph.addEdge(nodes[i], nodes[i + 1]);
+    }
+    graph.addEdge(nodes[0], nodes[3]);
+    graph.addEdge(nodes[1], nodes[4]);
+    graph.setEntryPoint(nodes.back());
 
-    // --- Test 7g: Search skips deleted nodes ---
-    cout << "\n  --- Search skips deleted nodes ---" << endl;
-    vector<double> queryVec = vectorize("data algo");
-    vector<SearchResult> results = search(&graph, queryVec, 5, EF_SEARCH);
-    // The search skeleton returns empty, but once Member 3 implements it,
-    // deleted nodes (n1, n2) should NOT appear in results.
-    // Only n0 ("data structures") should be returned.
-    cout << "  Search results count: " << results.size()
-         << " (skeleton returns 0, will work after Member 3 implements)" << endl;
-    cout << "  [PASS] Search compilation check (full test after Member 3)." << endl;
+    // --- 10a: Search before deletion ---
+    cout << "\n  --- 10a: Search before deletion ---" << endl;
+    vector<SearchResult> r_before = search(&graph, vectorize("fruit"), 5, EF_SEARCH);
+    cout << "  Results (5 nodes in graph):" << endl;
+    for (size_t i = 0; i < r_before.size(); i++) {
+        cout << "    " << r_before[i].text << " (dist: "
+             << fixed << setprecision(4) << r_before[i].distance << ")" << endl;
+    }
+    assert(r_before.size() == 5);
+    cout << "  [PASS]" << endl;
 
-    // --- Cleanup ---
-    delete n0;
-    delete n1;
-    delete n2;
-    cout << "\n  [ALL DELETION TESTS PASSED]" << endl;
+    // --- 10b: Delete "apple fruit" and search again ---
+    cout << "\n  --- 10b: Delete \"apple fruit\" and search ---" << endl;
+    graph.deleteNode(nodes[0]);
+    vector<SearchResult> r_after = search(&graph, vectorize("fruit"), 5, EF_SEARCH);
+    cout << "  Results (4 nodes remaining):" << endl;
+    for (size_t i = 0; i < r_after.size(); i++) {
+        cout << "    " << r_after[i].text << " (dist: "
+             << fixed << setprecision(4) << r_after[i].distance << ")" << endl;
+    }
+    assert(r_after.size() == 4);
+    // Verify deleted node is NOT in results
+    for (const SearchResult& sr : r_after) {
+        assert(sr.text != "apple fruit");
+    }
+    cout << "  Deleted node NOT in results (correct)" << endl;
+    cout << "  [PASS]" << endl;
+
+    // --- 10c: Brute force also confirms ---
+    cout << "\n  --- 10c: Brute force confirms ---" << endl;
+    vector<SearchResult> bf_after = bruteForceSearch(&graph, vectorize("fruit"), 5);
+    assert(bf_after.size() == 4);
+    for (const SearchResult& sr : bf_after) {
+        assert(sr.text != "apple fruit");
+    }
+    cout << "  Brute force also returns 4 results, no deleted node." << endl;
+    cout << "  [PASS]" << endl;
+
+    cout << "\n  [SEARCH AFTER DELETION PASSED]" << endl;
 }
 
 // ------------------------------------------------------------
@@ -465,12 +827,15 @@ void testLazyDeletion() {
 // ------------------------------------------------------------
 int main() {
     cout << "================================================" << endl;
-    cout << "  NSW Project — Full Skeleton Test Suite" << endl;
-    cout << "  Member 1: getTrigrams, hashTrigram, vectorize," << endl;
-    cout << "             cosineDistance" << endl;
-    cout << "  Member 2: NSWGraph (skeleton) + Lazy Deletion" << endl;
-    cout << "  Member 3: search() (skeleton)" << endl;
-    cout << "  Member 4: WAITING (needs Members 2 & 3)" << endl;
+    cout << "  NSW Project — Full Test Suite" << endl;
+    cout << "  Member 1 (Arqish): getTrigrams, hashTrigram," << endl;
+    cout << "                      vectorize, cosineDistance" << endl;
+    cout << "  Member 2 (Areeba):  NSWGraph — FULLY IMPLEMENTED" << endl;
+    cout << "                      createNode, addEdge, deleteNode" << endl;
+    cout << "  Member 3 (Hira):    search() + bruteForceSearch()" << endl;
+    cout << "                      FULLY IMPLEMENTED" << endl;
+    cout << "  Member 4 (Shaheer): Integration, CLI, Persistence" << endl;
+    cout << "  Deletion: HARD (edges removed, memory freed)" << endl;
     cout << "================================================" << endl;
 
     testGetTrigrams();
@@ -478,17 +843,18 @@ int main() {
     testVectorize();
     testCosineDistance();
     testEndToEnd();
-    testSkeletonCompilation();
-    testLazyDeletion();
+    testGraphOperations();
+    testHardDeletion();
+    testNSWSearch();
+    testSearchVsBruteForce();
+    testSearchAfterDeletion();
 
     cout << "\n================================================" << endl;
     cout << "  ALL TESTS PASSED!" << endl;
-    cout << "  Member 1: COMPLETE" << endl;
-    cout << "  Member 2: SKELETON READY (fill in TODOs)" << endl;
-    cout << "             removeNode() DONE (lazy deletion)" << endl;
-    cout << "  Member 3: SKELETON READY (fill in TODOs)" << endl;
-    cout << "             (deletion skip logic documented)" << endl;
-    cout << "  Member 4: WAITING (needs Members 2 & 3)" << endl;
+    cout << "  Member 1 (Arqish): COMPLETE" << endl;
+    cout << "  Member 2 (Areeba):  COMPLETE" << endl;
+    cout << "  Member 3 (Hira):    COMPLETE" << endl;
+    cout << "  Member 4 (Shaheer): Integration + CLI + Persistence" << endl;
     cout << "================================================" << endl;
 
     return 0;
