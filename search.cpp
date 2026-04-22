@@ -16,9 +16,10 @@ vector<SearchResult> search(NSWGraph* graph,const vector<double>& queryVector,in
     vector<SearchResult> final_results; //where we will keep our answers
 
     //first we shall check for an important  condition which is to check if graph empty
+    if (graph==nullptr){ return {};}
+
     Node* entry_node= graph->getEntryPoint(); //we will need this to begin our search
 
-    if ((graph==nullptr) || (entry_node==nullptr)){ return {};}
 
     //now we create a priority queue for min heap
     priority_queue < pair<double,Node*>,vector<pair<double, Node*>>,greater<pair<double, Node*>>> candidates_min;
