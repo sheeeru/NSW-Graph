@@ -22,33 +22,33 @@ void insert(NSWGraph* graph, const string& text) {
 
     //cout << "\n[insert] inserting: \"" << text << "\"" << endl;
 
-    // step 1: vectorize (Arqish's function)
+    //vectorize
     vector<double> vec = vectorize(text);
-    cout << "[insert] vectorized." << endl;
+    //cout << "vectorized." << endl;
 
-    // step 2: create node and track in masterList (Areeba's function)
+    //create node and track in masterList 
     Node* newNode = graph->createNode(text, vec);
     cout << "[insert] node created. total nodes: " << graph->getNodeCount() << endl;
 
-    // step 3: if this is the very first node, just set entry point
+    //if this is the very first node, just set entry point
     if (graph->getNodeCount() == 1) {
         graph->setEntryPoint(newNode);
         cout << "[insert] first node. entry point set to: \"" << text << "\"" << endl;
         return;
     }
 
-    // step 4: search for M closest existing nodes (Hira's function)
-    // search runs BEFORE we update entry point (see note above)
+    //search for M closest existing nodes 
+    //search runs BEFORE we update entry point (see note above)
     vector<SearchResult> closest = search(graph, vec, M, EF_SEARCH);
     cout << "[insert] found " << closest.size() << " closest neighbors:" << endl;
     for (int i = 0; i < closest.size(); i++) {
-        cout << "         [" << i << "] \"" << closest[i].text
+        cout << " [" << i << "] \"" << closest[i].text
              << "\" dist=" << closest[i].distance << endl;
     }
 
-    // step 5: connect new node to each closest neighbor (Areeba's function)
-    // we need the actual Node* pointer, not just the text string
-    // so we match by text through getAllNodes()
+    //connect new node to each closest neighbor 
+    //we need the actual Node* pointer, not just the text string
+    //so we match by text through getAllNodes()
     const vector<Node*>& allNodes = graph->getAllNodes();
     for (int i = 0; i < closest.size(); i++) {
         for (int j = 0; j < allNodes.size(); j++) {
@@ -62,7 +62,7 @@ void insert(NSWGraph* graph, const string& text) {
     cout << "[insert] \"" << text << "\" connected to "
          << newNode->neighbors.size() << " neighbors." << endl;
 
-    // step 6: new node becomes entry point for next insertion/search
+    //new node becomes entry point for next insertion/search
     graph->setEntryPoint(newNode);
     cout << "[insert] entry point updated to: \"" << text << "\"" << endl;
 }
