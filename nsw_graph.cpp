@@ -108,8 +108,7 @@ void NSWGraph::deleteNode(Node* target) {
     for (int i = 0; i < nb.size(); i++) {
         for (int j = i + 1; j < nb.size(); j++) {
             addEdge(nb[i], nb[j]);
-        }
-    }
+        } }
 
     //remove target from every neighbor's own list
     for (int i = 0; i < nb.size(); i++) {
