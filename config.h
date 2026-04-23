@@ -15,6 +15,6 @@ const int M = 3;
 //Exploration factor for Greedy Search.
 //Controls how many candidate paths the search keeps open.
 //Higher = more accurate but slower. Lower = faster but might miss results.
-const int EF_SEARCH = 32;
+const int EF_SEARCH = 6;
 
 #endif // CONFIG_H
