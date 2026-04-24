@@ -7,7 +7,7 @@
 using namespace std;
 
 
-// general priority queue syntax from the library priority_queue<Type,Container,Comparator>
+// general priority queue syntax from the library priority_queue<Type,Container,Comparator> (my fav library lowkey)
 
 //////////////////////////////////////////
 //         MAIN SEARCH FUNCTION         //
@@ -41,18 +41,10 @@ vector<SearchResult> search(NSWGraph* graph,const vector<double>& queryVector,in
         Node* current_node = current.second;
         double current_dist = current.first;
 
-        // --------------------------------------------------------
-        // EARLY STOPPING — key optimisation for O(log N) behaviour
-        //
         // results is a MAX-heap so results.top() is always the
         // WORST (largest distance) result we have found so far.
-        //
-        // If the current candidate is already worse than our worst
-        // result AND we already have K results, every remaining
-        // candidate in the min-heap will also be worse (heap property).
-        // No point continuing — we cannot improve our top-K anymore.
-        // --------------------------------------------------------
-        if ((int)results.size() >= k && current_dist > results.top().first){
+
+        if ((int)results.size() >= k && current_dist > results.top().first){ //this will help us optimise mroe 
             break;
         }
 
@@ -62,15 +54,9 @@ vector<SearchResult> search(NSWGraph* graph,const vector<double>& queryVector,in
                     visited_nodes.insert(current_node->neighbors[i]); //mark it visited since its visited now
 
                     double distance_2 = cosineDistance(queryVector, current_node->neighbors[i]->numericalVector); //calc distance between query vector and current neighbour
-                    
-                    // --------------------------------------------------------
-                    // efSearch controls the beam width of the search.
-                    // We only add a neighbor to candidates if we have not yet
-                    // reached efSearch candidates, OR if this neighbor is
+                    // We only add a neighbor to candidates if we have not yetreached efSearch candidates, OR if this neighbor is
                     // closer than our current worst result.
-                    // This prevents the candidate heap from growing too large
-                    // and keeps the search focused on promising nodes.
-                    // --------------------------------------------------------
+
                     if ((int)candidates_min.size() < efSearch || distance_2 < results.top().first){
                         candidates_min.push({distance_2, current_node->neighbors[i]});
                     }
@@ -100,40 +86,35 @@ vector<SearchResult> search(NSWGraph* graph,const vector<double>& queryVector,in
 }
 
 
-// ============================================================
 // bruteForceSearch()
-// Scans every node in the graph linearly — O(N).
-// Used ONLY for benchmarking: run this alongside search() on
-// datasets of increasing size to prove NSW is faster.
-// Also useful as a correctness check — results should roughly
-// match search() output.
-// ============================================================
-vector<SearchResult> bruteForceSearch(
-    NSWGraph* graph,
-    const vector<double>& queryVector,
-    int k
-) {
-    vector<SearchResult> results;
+// Scans every node in the graph linearly — O(N). I made this just to check (optional fro my checking latet)
 
-    if (graph == nullptr || k <= 0) return results;
+// vector<SearchResult> bruteForceSearch(
+//     NSWGraph* graph,
+//     const vector<double>& queryVector,
+//     int k
+// ) {
+//     vector<SearchResult> results;
 
-    const vector<Node*>& nodes = graph->getAllNodes();
+//     if (graph == nullptr || k <= 0) return results;
 
-    for (Node* node : nodes) {
+//     const vector<Node*>& nodes = graph->getAllNodes();
 
-        double dist = cosineDistance(queryVector, node->numericalVector);
+//     for (Node* node : nodes) {
 
-        results.push_back({node->text, dist});
-    }
+//         double dist = cosineDistance(queryVector, node->numericalVector);
 
-    sort(results.begin(), results.end(),
-         [](const SearchResult& a, const SearchResult& b) {
-             return a.distance < b.distance;
-         });
+//         results.push_back({node->text, dist});
+//     }
 
-    if (results.size() > (size_t)k) {
-        results.resize(k);
-    }
+//     sort(results.begin(), results.end(),
+//          [](const SearchResult& a, const SearchResult& b) {
+//              return a.distance < b.distance;
+//          });
 
-    return results;
-}
+//     if (results.size() > (size_t)k) {
+//         results.resize(k);
+//     }
+
+//     return results;
+// }
