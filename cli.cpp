@@ -57,9 +57,7 @@ int main() {
             argument = line.substr(spacePos + 1);
         }
 
-        // -------------------------------------------------------
         // ADD
-        // -------------------------------------------------------
         if (command == "add") {
             if (argument.empty()) {
                 cout << "Usage: add <text>" << endl;
@@ -69,9 +67,7 @@ int main() {
             cout << "Added. Total nodes: " << graph.getNodeCount() << endl;
         }
 
-        // -------------------------------------------------------
         // SEARCH
-        // -------------------------------------------------------
         else if (command == "search") {
             if (argument.empty()) {
                 cout << "Usage: search <text>" << endl;
@@ -102,9 +98,7 @@ int main() {
             }
         }
 
-        // -------------------------------------------------------
         // DELETE
-        // -------------------------------------------------------
         else if (command == "delete") {
             if (argument.empty()) {
                 cout << "Usage: delete <text>" << endl;
@@ -134,38 +128,27 @@ int main() {
             }
         }
 
-        // -------------------------------------------------------
         // SHOW
-        // -------------------------------------------------------
         else if (command == "show") {
             graph.printGraph();
         }
-
-        // -------------------------------------------------------
-        // COUNT
-        // -------------------------------------------------------
+        //COUNT
         else if (command == "count") {
             cout << "Total nodes: " << graph.getNodeCount() << endl;
         }
 
-        // -------------------------------------------------------
         // HELP
-        // -------------------------------------------------------
         else if (command == "help") {
             printHelp();
         }
 
-        // -------------------------------------------------------
-        // EXIT
-        // -------------------------------------------------------
+        //EXIT
         else if (command == "exit") {
             cout << "Exiting. Destructor will free all nodes." << endl;
             break;
         }
 
-        // -------------------------------------------------------
-        // UNKNOWN
-        // -------------------------------------------------------
+        //UNKNOWN
         else {
             cout << "Unknown command: \"" << command << "\". Type 'help'." << endl;
         }

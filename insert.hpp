@@ -6,7 +6,7 @@
 #include "vectorizer.h"
 
 //adds a new text phrase into the NSW graph
-//handles the full pipeline: text → vector → node → edges → entry point
+//order: text → vector → node → edges → entry point
 void insert(NSWGraph* graph, const string& text);
 
 #endif // INSERT_H

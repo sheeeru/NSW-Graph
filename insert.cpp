@@ -20,11 +20,8 @@ void insert(NSWGraph* graph, const string& text) {
         return;
     }
 
-    //cout << "\n[insert] inserting: \"" << text << "\"" << endl;
-
     //vectorize
     vector<double> vec = vectorize(text);
-    //cout << "vectorized." << endl;
 
     //create node and track in masterList 
     Node* newNode = graph->createNode(text, vec);

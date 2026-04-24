@@ -1,16 +1,6 @@
-// ============================================================
-// main.cpp — NSW Project Test Harness (Phase 1)
-//
-// Tests Member 1's vectorizer functions (getTrigrams, hashTrigram,
-// vectorize, cosineDistance) and Member 2's graph functions
-// (createNode, addEdge, deleteNode, printGraph).
-//
-// search() and bruteForceSearch() are NOT tested here —
-// those will be tested when Member 4 integrates everything.
-//
+// main.cpp (don't run this yet)
 // Compile:  g++ -std=c++17 -o test main.cpp vectorizer.cpp nsw_graph.cpp search.cpp
 // Run:      ./test
-// ============================================================
 
 #include <iostream>
 #include <iomanip>
@@ -23,9 +13,6 @@
 
 using namespace std;
 
-// ------------------------------------------------------------
-// Helper: count non-zero elements in a vector
-// ------------------------------------------------------------
 int countNonZero(const vector<double> &vec)
 {
     int count = 0;
@@ -37,9 +24,7 @@ int countNonZero(const vector<double> &vec)
     return count;
 }
 
-// ------------------------------------------------------------
 // Helper: print a vector (shows non-zero entries only)
-// ------------------------------------------------------------
 void printVectorSparse(const vector<double> &vec)
 {
     cout << "  Size: " << vec.size() << " | Non-zero entries: " << countNonZero(vec) << endl;
@@ -58,9 +43,7 @@ void printVectorSparse(const vector<double> &vec)
     cout << "]" << endl;
 }
 
-// ------------------------------------------------------------
 // Helper: print a vector of strings
-// ------------------------------------------------------------
 void printStringVec(const vector<string> &vec)
 {
     cout << "  [";
@@ -73,16 +56,6 @@ void printStringVec(const vector<string> &vec)
     cout << "]" << endl;
 }
 
-// =============================================================
-//  MEMBER 1 — ARQISH (Vectorizer & Math Specialist)
-//  Tests: getTrigrams, hashTrigram, vectorize, cosineDistance
-// =============================================================
-
-// ------------------------------------------------------------
-// TEST 1: getTrigrams()
-// Tests the sliding window trigram extraction.
-// Verifies: normal text, exact-3, short (padded), empty, long
-// ------------------------------------------------------------
 void testGetTrigrams()
 {
     cout << "\n========================================" << endl;
@@ -156,10 +129,8 @@ void testGetTrigrams()
     cout << "\n  [ALL GETTRIGRAMS TESTS PASSED]" << endl;
 }
 
-// ------------------------------------------------------------
 // TEST 2: hashTrigram()
 // Tests that hashing is deterministic and in valid range.
-// ------------------------------------------------------------
 void testHashTrigram()
 {
     cout << "\n========================================" << endl;
@@ -215,11 +186,9 @@ void testHashTrigram()
     cout << "\n  [ALL HASHTRIGRAM TESTS PASSED]" << endl;
 }
 
-// ------------------------------------------------------------
 // TEST 3: vectorize()
 // Tests text-to-vector conversion.
 // Verifies: correct size, determinism, typo-tolerance, empty input
-// ------------------------------------------------------------
 void testVectorize()
 {
     cout << "\n========================================" << endl;
@@ -289,12 +258,10 @@ void testVectorize()
     cout << "\n  [ALL VECTORIZE TESTS PASSED]" << endl;
 }
 
-// ------------------------------------------------------------
 // TEST 4: cosineDistance()
 // Tests the distance metric with known vectors.
 // Verifies: identical, opposite, orthogonal, zero-vector guard,
 //           real-world text comparison, size mismatch guard
-// ------------------------------------------------------------
 void testCosineDistance()
 {
     cout << "\n========================================" << endl;
@@ -368,12 +335,10 @@ void testCosineDistance()
     cout << "\n  [ALL COSINEDISTANCE TESTS PASSED]" << endl;
 }
 
-// ------------------------------------------------------------
 // TEST 5: End-to-End Vectorizer Demonstration
 // Shows the full pipeline: text -> trigrams -> hash -> vector
 // -> cosine distance -> best match. Uses manual brute-force
 // (no search() function — just comparing all distances).
-// ------------------------------------------------------------
 void testVectorizerEndToEnd()
 {
     cout << "\n========================================" << endl;
@@ -426,17 +391,13 @@ void testVectorizerEndToEnd()
     cout << "\n  [END-TO-END VECTORIZER DEMO PASSED]" << endl;
 }
 
-// =============================================================
 //  MEMBER 2 — AREEBA (Graph Structure & Memory Specialist)
 //  Tests: createNode, addEdge, deleteNode, printGraph,
 //         setEntryPoint, getEntryPoint, getNodeCount, getAllNodes
-// =============================================================
 
-// ------------------------------------------------------------
 // TEST 6: Graph Construction & Edge Operations
 // Tests: empty graph, createNode, addEdge, self-edge,
 //        duplicate edge, entry point, printGraph, getAllNodes
-// ------------------------------------------------------------
 void testGraphOperations()
 {
     cout << "\n========================================" << endl;
@@ -531,12 +492,10 @@ void testGraphOperations()
     cout << "\n  [ALL GRAPH OPERATION TESTS PASSED]" << endl;
 }
 
-// ------------------------------------------------------------
 // TEST 7: Hard Deletion
 // Tests: deleteNode with relinking, edge removal, entry point
 //        reassignment, nullptr guard, M limit relinking,
 //        no dangling pointers, no duplicate edges
-// ------------------------------------------------------------
 void testHardDeletion()
 {
     cout << "\n========================================" << endl;
@@ -724,16 +683,14 @@ void testHardDeletion()
     cout << "\n  [ALL HARD DELETION TESTS PASSED]" << endl;
 }
 
-// =============================================================
 //  MAIN — Run all tests
-// =============================================================
 int main()
 {
     cout << "================================================" << endl;
     cout << "  NSW Project — Component Test Suite (Phase 1)" << endl;
     cout << "================================================" << endl;
     cout << "  Member 1 (Arqish): getTrigrams, hashTrigram," << endl;
-    cout << "                      vectorize, cosineDistance" << endl;
+    cout << "                     vectorize, cosineDistance" << endl;
     cout << "  Member 2 (Areeba):  NSWGraph — createNode," << endl;
     cout << "                      addEdge, deleteNode" << endl;
     cout << "  Member 3 (Hira):    search.h/cpp (NOT tested here)" << endl;
