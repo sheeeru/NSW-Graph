@@ -78,5 +78,5 @@ double cosineDistance(const vector<double>& A, const vector<double>& B) {
     double similarity = dotProduct / (magnitudeA * magnitudeB);
     if (similarity > 1.0) similarity = 1.0;
     if (similarity < -1.0) similarity = -1.0;
-    return 1.0 - similarity; //convert similarity to diff 
+    return 1.0 - similarity; //convert similarity to diff
 }

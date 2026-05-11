@@ -1,5 +1,5 @@
 // cli.cpp — Interactive NSW Graph CLI
-// Compile: g++ -std=c++17 -o cli cli.cpp vectorizer.cpp nsw_graph.cpp search.cpp insert.cpp
+// Compile: g++ -std=c++17 -o cli cli.cpp vectorizer.cpp nsw_graph.cpp search.cpp insert.cpp persistence.cpp
 // Run:     ./cli
 
 #include <iostream>
@@ -8,6 +8,7 @@
 #include "vectorizer.h"
 #include "search.h"
 #include "insert.hpp"
+#include "persistence.h"
 using namespace std;
 
 void printHelp() {
@@ -18,6 +19,8 @@ void printHelp() {
     cout << "  show            — print the full graph state" << endl;
     cout << "  count           — print total node count" << endl;
     cout << "  help            — show this menu" << endl;
+    cout << "  save <file>     — save all nodes to a text file" << endl;
+    cout << "  load <file>     — load nodes from a text file" << endl;
     cout << "  exit            — quit the program" << endl;
     cout << endl;
 }
@@ -135,6 +138,24 @@ int main() {
         //COUNT
         else if (command == "count") {
             cout << "Total nodes: " << graph.getNodeCount() << endl;
+        }
+
+        // SAVE
+        else if (command == "save") {
+            if (argument.empty()) {
+                cout << "Usage: save <filename>" << endl;
+                continue;
+            }
+            saveToFile(&graph, argument);
+        }
+
+        // LOAD
+        else if (command == "load") {
+            if (argument.empty()) {
+                cout << "Usage: load <filename>" << endl;
+                continue;
+            }
+            loadFromFile(&graph, argument);
         }
 
         // HELP

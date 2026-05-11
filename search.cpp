@@ -18,7 +18,7 @@ vector<SearchResult> search(NSWGraph* graph,const vector<double>& queryVector,in
 
     Node* entry_node= graph->getEntryPoint(); //we will need this to begin our search
 
-    if (entry_node == nullptr) { return {}; } 
+    if (entry_node == nullptr) { return {}; }
 
     //now we create a priority queue for min heap
     priority_queue < pair<double,Node*>,vector<pair<double, Node*>>,greater<pair<double, Node*>>> candidates_min;
@@ -28,12 +28,12 @@ vector<SearchResult> search(NSWGraph* graph,const vector<double>& queryVector,in
 
     //now we will push our first entry to min and max heap
 
-    candidates_min.push({distance,entry_node}); 
+    candidates_min.push({distance,entry_node});
     results.push({distance,entry_node});
     visited_nodes.insert(entry_node); //it is now visited too
 
     while (!candidates_min.empty()){
-        pair<double,Node*> current = candidates_min.top(); 
+        pair<double,Node*> current = candidates_min.top();
         candidates_min.pop(); //get the smallest distance node of this node we have popped
 
         Node* current_node = current.second;
@@ -48,11 +48,11 @@ vector<SearchResult> search(NSWGraph* graph,const vector<double>& queryVector,in
 
         for (int i = 0; i < (int)current_node->neighbors.size(); i++){ //loop through to find the neighbours of a node
             if (visited_nodes.count(current_node->neighbors[i]) == 0){ // not visited before (count tells existence in unordered set, 1 if exists 0 otherwise)
-                    
+
                     visited_nodes.insert(current_node->neighbors[i]); //mark it visited since its visited now
 
                     double distance_2 = cosineDistance(queryVector, current_node->neighbors[i]->numericalVector); //calc distance between query vector and current neighbour
-                    
+
                     // efSearch controls the  width of the search.SO ITS MORE OPTIMISED ONLY DOES USEFUL SEEARCH
                     // We  add a neighbor to candidates if we have not yet
                     // reached efSearch candidate (one of conditions)
@@ -74,7 +74,7 @@ vector<SearchResult> search(NSWGraph* graph,const vector<double>& queryVector,in
 
     while (!results.empty()){
         final_results.push_back({ //use max heap to get final results
-            
+
             results.top().second->text,
             results.top().first
         });
@@ -83,4 +83,35 @@ vector<SearchResult> search(NSWGraph* graph,const vector<double>& queryVector,in
 
     reverse(final_results.begin(), final_results.end()); //because max heap gives worst to best, we reverse to get best to worst
     return final_results;
+}
+
+//         BRUTE FORCE SEARCH         //
+// Compares query against every node in the graph.
+// No priority queues, no graph traversal — just a flat loop.
+// Returns top-k results sorted by distance (closest first).
+vector<SearchResult> bruteForceSearch(const NSWGraph* graph, const vector<double>& queryVector, int k) {
+    vector<SearchResult> results;
+
+    if (graph == nullptr || k <= 0) return results;
+
+    const vector<Node*>& allNodes = graph->getAllNodes();
+    if (allNodes.empty()) return results;
+
+    // Calculate distance to every single node
+    vector<pair<double, string>> distances;
+    for (size_t i = 0; i < allNodes.size(); i++) {
+        double dist = cosineDistance(queryVector, allNodes[i]->numericalVector);
+        distances.push_back({dist, allNodes[i]->text});
+    }
+
+    // Sort by distance ascending (closest first)
+    sort(distances.begin(), distances.end());
+
+    // Return top-k
+    size_t count = min((size_t)k, distances.size());
+    for (size_t i = 0; i < count; i++) {
+        results.push_back({distances[i].second, distances[i].first});
+    }
+
+    return results;
 }

@@ -22,15 +22,15 @@ public:
     //Constructor:
     NSWGraph();
 
-    //Destructor: loop and del all nodes. 
+    //Destructor: loop and del all nodes.
     ~NSWGraph();
 
     //unweightaed bidirectional edge btw two nodes
     //both in each other's neighbor list
-    //each node cna have a max degree M 
+    //each node cna have a max degree M
     //if a's max degree reached node will not be added in enighbor so skip
     void printGraph() const;
-    
+
     void addEdge(Node* a, Node* b);
 
     //make new node, add it to masterList, and return a pointer. (cater the deletion case for space freeup)

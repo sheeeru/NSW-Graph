@@ -23,7 +23,7 @@ void insert(NSWGraph* graph, const string& text) {
     //vectorize
     vector<double> vec = vectorize(text);
 
-    //create node and track in masterList 
+    //create node and track in masterList
     Node* newNode = graph->createNode(text, vec);
     cout << "[insert] node created. total nodes: " << graph->getNodeCount() << endl;
 
@@ -34,7 +34,7 @@ void insert(NSWGraph* graph, const string& text) {
         return;
     }
 
-    //search for M closest existing nodes 
+    //search for M closest existing nodes
     //search runs BEFORE we update entry point (see note above)
     vector<SearchResult> closest = search(graph, vec, M, EF_SEARCH);
     cout << "[insert] found " << closest.size() << " closest neighbors:" << endl;
@@ -43,7 +43,7 @@ void insert(NSWGraph* graph, const string& text) {
              << "\" dist=" << closest[i].distance << endl;
     }
 
-    //connect new node to each closest neighbor 
+    //connect new node to each closest neighbor
     //we need the actual Node* pointer, not just the text string
     //so we match by text through getAllNodes()
     const vector<Node*>& allNodes = graph->getAllNodes();

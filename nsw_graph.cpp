@@ -81,7 +81,7 @@ void NSWGraph::addEdge(Node* a, Node* b) {
         a->neighbors.push_back(b);
         b->neighbors.push_back(a);
         cout << "Node edge from " << a->text << " to " << b->text << " created" << endl;}
-    else 
+    else
         cout << "edge addition failed! Size exceeds Max nighbors M = " << M << endl;
 }
 
@@ -91,9 +91,9 @@ void NSWGraph::addEdge(Node* a, Node* b) {
 
 // ------------------------------------------------------------
 Node* NSWGraph::createNode(const string& text, const vector<double>& vec) {
-    
+
     Node* newNode = new Node(text, vec);
-    masterList.push_back(newNode); // this catering addition to the list so that when we delete and destructr gets called ALL nodes delete 
+    masterList.push_back(newNode); // this catering addition to the list so that when we delete and destructr gets called ALL nodes delete
     return newNode;
 }
 
@@ -104,11 +104,12 @@ void NSWGraph::deleteNode(Node* target) {
     vector<Node*>& nb = target->neighbors;
 
     //relink neighbors to each other
-    //addEdge checks M limit, so no neighbor gets over-connected. 
+    //addEdge checks M limit, so no neighbor gets over-connected.
     for (int i = 0; i < nb.size(); i++) {
         for (int j = i + 1; j < nb.size(); j++) {
             addEdge(nb[i], nb[j]);
-        } }
+        }
+    }
 
     //remove target from every neighbor's own list
     for (int i = 0; i < nb.size(); i++) {
@@ -169,4 +170,3 @@ int NSWGraph::getNodeCount() const {
 const vector<Node*>& NSWGraph::getAllNodes() const {
     return masterList;
 }
-
