@@ -84,34 +84,3 @@ vector<SearchResult> search(NSWGraph* graph,const vector<double>& queryVector,in
     reverse(final_results.begin(), final_results.end()); //because max heap gives worst to best, we reverse to get best to worst
     return final_results;
 }
-
-//         BRUTE FORCE SEARCH         //
-// Compares query against every node in the graph.
-// No priority queues, no graph traversal — just a flat loop.
-// Returns top-k results sorted by distance (closest first).
-vector<SearchResult> bruteForceSearch(const NSWGraph* graph, const vector<double>& queryVector, int k) {
-    vector<SearchResult> results;
-
-    if (graph == nullptr || k <= 0) return results;
-
-    const vector<Node*>& allNodes = graph->getAllNodes();
-    if (allNodes.empty()) return results;
-
-    // Calculate distance to every single node
-    vector<pair<double, string>> distances;
-    for (size_t i = 0; i < allNodes.size(); i++) {
-        double dist = cosineDistance(queryVector, allNodes[i]->numericalVector);
-        distances.push_back({dist, allNodes[i]->text});
-    }
-
-    // Sort by distance ascending (closest first)
-    sort(distances.begin(), distances.end());
-
-    // Return top-k
-    size_t count = min((size_t)k, distances.size());
-    for (size_t i = 0; i < count; i++) {
-        results.push_back({distances[i].second, distances[i].first});
-    }
-
-    return results;
-}
