@@ -18,12 +18,5 @@ std::vector<SearchResult> search(
     int k,
     int efSearch
 );
-// bruteForceSearch()
-// Checks EVERY node — no graph traversal.
-// Used as ground-truth for hit-rate measurement.
-std::vector<SearchResult> bruteForceSearch(
-    const NSWGraph* graph,
-    const std::vector<double>& queryVector,
-    int k
-);
+
 #endif // SEARCH_H
