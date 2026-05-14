@@ -38,7 +38,7 @@ void insert(NSWGraph* graph, const string& text) {
     //search runs BEFORE we update entry point (see note above)
     vector<SearchResult> closest = search(graph, vec, M, EF_SEARCH);
     cout << "[insert] found " << closest.size() << " closest neighbors:" << endl;
-    for (int i = 0; i < closest.size(); i++) {
+    for (int i = 0; i < (int)closest.size(); i++) {
         cout << " [" << i << "] \"" << closest[i].text
              << "\" dist=" << closest[i].distance << endl;
     }
@@ -47,8 +47,8 @@ void insert(NSWGraph* graph, const string& text) {
     //we need the actual Node* pointer, not just the text string
     //so we match by text through getAllNodes()
     const vector<Node*>& allNodes = graph->getAllNodes();
-    for (int i = 0; i < closest.size(); i++) {
-        for (int j = 0; j < allNodes.size(); j++) {
+    for (int i = 0; i < (int)closest.size(); i++) {
+        for (int j = 0; j < (int)allNodes.size(); j++) {
             if (allNodes[j]->text == closest[i].text && allNodes[j] != newNode) {
                 graph->addEdge(newNode, allNodes[j]);
                 break;

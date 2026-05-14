@@ -11,7 +11,7 @@ NSWGraph::NSWGraph() {
 
 
 NSWGraph::~NSWGraph() {// loop and delete all nodes frfom master list
-    for (int i=0; i<masterList.size(); i++){
+    for (int i=0; i<(int)masterList.size(); i++){
         delete masterList[i];
     }
     masterList.clear();
@@ -24,7 +24,7 @@ NSWGraph::~NSWGraph() {// loop and delete all nodes frfom master list
 // -------------------------------------------------------
 // Loops through every node in masterList and prints
 // its text and the text of each of its neighbors.
-// Used for debugging and viva demonstration.
+// for cli (terminal output)
 
 void NSWGraph::printGraph() const {
     if (masterList.empty()) {
@@ -34,15 +34,15 @@ void NSWGraph::printGraph() const {
     cout << "--- Graph State ---" << endl;
     cout << "Total nodes: " << masterList.size() << endl << endl;
 
-    for (int i = 0; i < masterList.size(); i++) {
+    for (int i = 0; i < (int)masterList.size(); i++) {
         Node* current = masterList[i];
 
         cout << "[" << i << "] " << current->text << endl;
         cout << "Neighbors (" << current->neighbors.size() << "): ";
 
-        for (int j = 0; j < current->neighbors.size(); j++) {
+        for (int j = 0; j < (int)current->neighbors.size(); j++) {
             cout << current->neighbors[j]->text;
-            if (j < current->neighbors.size() - 1) {
+            if (j < (int)current->neighbors.size() - 1) {
                 cout << ", "; }
         }
         cout << endl << endl;
@@ -70,7 +70,7 @@ void NSWGraph::addEdge(Node* a, Node* b) {
     }
 
     // dupecheck if already in enighbor list
-    for (int i = 0; i < a->neighbors.size(); i++) {
+    for (int i = 0; i < (int)a->neighbors.size(); i++) {
         if (a->neighbors[i] == b) {
             return; // already connected, skip
         }
@@ -105,16 +105,16 @@ void NSWGraph::deleteNode(Node* target) {
 
     //relink neighbors to each other
     //addEdge checks M limit, so no neighbor gets over-connected.
-    for (int i = 0; i < nb.size(); i++) {
-        for (int j = i + 1; j < nb.size(); j++) {
+    for (int i = 0; i < (int)nb.size(); i++) {
+        for (int j = i + 1; j < (int)nb.size(); j++) {
             addEdge(nb[i], nb[j]);
         }
     }
 
     //remove target from every neighbor's own list
-    for (int i = 0; i < nb.size(); i++) {
+    for (int i = 0; i < (int)nb.size(); i++) {
         vector<Node*>& theirNeighbors = nb[i]->neighbors;
-        for (int j = 0; j < theirNeighbors.size(); j++) {
+        for (int j = 0; j < (int)theirNeighbors.size(); j++) {
             if (theirNeighbors[j] == target) {
                 theirNeighbors.erase(theirNeighbors.begin() + j);
                 break; //only appears once because add edge ensures no dupe copies ar made in neighbor list
@@ -123,7 +123,7 @@ void NSWGraph::deleteNode(Node* target) {
     }
 
     //remove from masterList
-    for (int i = 0; i < masterList.size(); i++) {
+    for (int i = 0; i < (int)masterList.size(); i++) {
         if (masterList[i] == target) {
             masterList.erase(masterList.begin() + i);
             break;
