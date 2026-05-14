@@ -7,8 +7,8 @@ const int VECTOR_DIM = 300;
 
 //Max number of neighbors per node (graph degree limit).
 //Range: 8 (sparse, fast) to 16 (dense, accurate).
-//const int M = 16;
-const int M = 3;
+const int M = 16;
+//const int M = 3;
 
 //Exploration factor for Greedy Search.
 //Controls how many candidate paths the search keeps open.
