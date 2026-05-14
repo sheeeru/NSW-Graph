@@ -1,9 +1,6 @@
 // gui.cpp — NSW Graph SFML Frontend (with animated graph visualiser)
-// Compile:
-//   g++ -std=c++17 gui.cpp vectorizer.cpp nsw_graph.cpp search.cpp \
-//       insert.cpp persistence.cpp \
-//       -lsfml-graphics -lsfml-window -lsfml-system -o gui
-//
+// Compile: g++ -std=c++17 gui.cpp vectorizer.cpp nsw_graph.cpp search.cpp insert.cpp persistence.cpp -lsfml-graphics -lsfml-window -lsfml-system -o gui
+// ./gui.exe
 // Put any .ttf font inside an  assets/  folder next to gui.cpp.
 #include <SFML/Graphics.hpp>
 #include <string>
